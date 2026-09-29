@@ -110,6 +110,7 @@ $normalize = function ($it) use ($siteUrl) {
         'fire_class'    => trim((string)isset($it['fire_class']) ? $it['fire_class'] : ''),
         'thickness'     => (int)(isset($it['thickness']) ? $it['thickness'] : 0),
         'tags'          => array_values(array_filter(array_map('trim', explode('|', (string)isset($it['tags']) ? $it['tags'] : '')))),
+        'properties'    => array_values(array_filter(explode('|', (string)isset($it['properties']) ? $it['properties'] : ''))),
         'stock'         => trim((string)isset($it['stock']) ? $it['stock'] : ''),
         'price'         => array(
             'kind'  => trim((string)isset($it['price_kind']) ? $it['price_kind'] : ''),

@@ -143,6 +143,7 @@ foreach ($items as $it) {
         'tags'        => $tagsHtml,
         'image'       => htmlspecialchars($image, ENT_QUOTES),
         'stock'       => $stock,
+        'properties'  => htmlspecialchars(trim((string)isset($it['properties']) ? $it['properties'] : ''), ENT_QUOTES),
         'price_kind'  => trim((string)isset($it['price_kind']) ? $it['price_kind'] : ''),
         'price_label' => htmlspecialchars(trim((string)isset($it['price_label']) ? $it['price_label'] : ''), ENT_QUOTES),
         'price_value' => htmlspecialchars(trim((string)isset($it['price_value']) ? $it['price_value'] : ''), ENT_QUOTES),

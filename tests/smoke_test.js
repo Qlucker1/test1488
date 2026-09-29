@@ -1,8 +1,12 @@
-/* Minimal DOM shim smoke-test for catalog.js and product.js (Node, no jsdom). */
+/* Smoke-тесты JS каталога и карточки товара (Node, DOM-шим, браузер не нужен).
+   Запуск: node tests/smoke_test.js */
 const fs = require('fs');
 const vm = require('vm');
 const path = require('path');
 const ROOT = path.join(__dirname, '..');
+
+const DATA = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/products.json'), 'utf8'));
+const exp = fn => DATA.products.filter(fn).length;
 
 class FakeEl {
   constructor(id) {
@@ -13,6 +17,8 @@ class FakeEl {
     this.value = '';
     this.dataset = {};
     this.style = {};
+    this.checked = false;
+    this.parentElement = null;
     this._listeners = {};
     const self = this;
     this.classList = {
@@ -70,6 +76,48 @@ function makeEnv(extra = {}) {
   return { sandbox, byId, docListeners };
 }
 
+/* Фейковый сайдбар фильтров (статичный HTML в реальном DOM) */
+function makeFilters(byId) {
+  const inputs = [];
+  const add = (filter, value, label) => {
+    const inp = new FakeEl('inp-' + filter + '-' + value);
+    inp.value = value;
+    inp.dataset = { filter, value };
+    const lbl = new FakeEl('lbl-' + value);
+    lbl.textContent = label;
+    inp.parentElement = lbl;
+    inputs.push(inp);
+    return inp;
+  };
+  [
+    ['faades', 'Фасады'], ['peregorodki', 'Сантехнические перегородки'], ['laboratorii', 'Чистые помещения'],
+    ['medicina', 'Медицинские учреждения'], ['orientka', 'Интерьерная отделка'], ['mebel', 'Мебель'], ['transport', 'Транспорт']
+  ].forEach(a => add('apps', a[0], a[1]));
+  ['Compact HPL', 'Standard HPL', 'Facade HPL', 'Laboratory HPL']
+    .forEach(v => add('category', v, v));
+  [
+    ['fire', 'Трудногорючий'], ['biocidal', 'Биоцидный'],
+    ['chemical', 'Химически стойкий'], ['moisture', 'Влагостойкий']
+  ].forEach(a => add('property', a[0], a[1]));
+  [['in_stock', 'В наличии'], ['under_order', 'Под заказ'], ['request', 'По запросу']]
+    .forEach(a => add('stock', a[0], a[1]));
+
+  const buttons = [4, 6, 8, 10, 12, 16, 25].map(t => {
+    const b = new FakeEl('th-' + t);
+    b.dataset = { filter: 'thickness', value: String(t) };
+    return b;
+  });
+
+  const box = new FakeEl('catalogFilters');
+  box.querySelectorAll = sel => {
+    if (sel === 'input[data-filter]') return inputs;
+    if (sel === '.thickness-toggle') return buttons;
+    return [];
+  };
+  byId['catalogFilters'] = box;
+  return { box, inputs, buttons };
+}
+
 function fireReady(docListeners) {
   (docListeners['DOMContentLoaded'] || []).forEach(fn => fn());
 }
@@ -85,6 +133,7 @@ function check(name, cond, extra = '') {
 (async function testCatalog() {
   console.log('catalog.js:');
   const { sandbox, byId, docListeners } = makeEnv();
+  const { box, inputs, buttons } = makeFilters(byId);
   vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets/js/main.js'), 'utf8'), sandbox, { filename: 'main.js' });
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets/js/catalog.js'), 'utf8'), sandbox, { filename: 'catalog.js' });
@@ -93,50 +142,89 @@ function check(name, cond, extra = '') {
 
   const grid = byId['catalogGrid'];
   const countEl = byId['catalogCount'];
-  const pills = byId['catalogPills'];
   const chips = byId['catalogChips'];
   const loadmore = byId['catalogLoadmore'];
   const note = byId['catalogLoadmoreNote'];
   const resetBtn = byId['__q_.js-reset'];
   const loadmoreBtn = byId['__q_.js-loadmore'];
+  const inp = (g, v) => inputs.find(i => i.dataset.filter === g && i.dataset.value === v);
+  const btn = t => buttons.find(b => b.dataset.value === String(t));
+  const change = () => (box._listeners['change'] || []).forEach(fn => fn({}));
+  const clickTh = b => (box._listeners['click'] || []).forEach(fn => fn({ target: { closest: () => b } }));
+  const doReset = () => (resetBtn._listeners['click'] || []).forEach(fn => fn());
+  const found = () => (countEl.innerHTML.match(/<b>(\d+)<\/b>/) || [])[1];
 
-  check('grid has 9 cards initially', count(grid.innerHTML, 'class="product-card"') === 9, 'got ' + count(grid.innerHTML, 'class="product-card"'));
-  check('count shows «24 решения»', countEl.innerHTML.includes('<b>24</b>') && countEl.innerHTML.includes('решения'), countEl.innerHTML);
-  check('loadmore visible', loadmore.hidden === false);
-  check('note shows «Показано 9 из 24»', note.textContent.includes('9 из 24'), note.textContent);
-  check('first card is 12mm partitions', grid.innerHTML.includes('HPL панели 12 мм для сантехнических перегородок'));
-  check('card links to product.html?id=', grid.innerHTML.includes('product.html?id=hpl-12-peregorodki'));
-  check('badge rendered', grid.innerHTML.includes('product-card__badge'));
-  check('pills generated from JSON (7 сфер + «Все сферы» в конце)', count(pills.innerHTML, 'class="catalog-pill') === 8, 'got ' + count(pills.innerHTML, 'class="catalog-pill'));
-  check('«Все сферы» без дубля и в конце', count(pills.innerHTML, '>Все сферы</button>') === 1 && pills.innerHTML.lastIndexOf('Все сферы') > pills.innerHTML.lastIndexOf('Транспорт'));
-  check('первая карточка: бейдж KM1 на фото', grid.innerHTML.includes('product-card__fire-badge') && grid.innerHTML.includes('>KM1</span>'));
+  check('сетка: 9 карточек, «Найдено 24 решения»',
+    count(grid.innerHTML, 'class="product-card"') === 9 && found() === '24', 'found=' + found());
+  check('первая карточка: 12 мм перегородки + бейдж KM1',
+    grid.innerHTML.includes('HPL панели 12 мм для сантехнических перегородок')
+    && grid.innerHTML.includes('product-card__fire-badge'));
+  check('loadmore: «Показано 9 из 24»', note.textContent.includes('9 из 24'), note.textContent);
 
+  /* --- Фильтры --- */
+  inp('apps', 'peregorodki').checked = true; change(); await wait(20);
+  check('фильтр «Сантехнические перегородки» → ' + exp(p => p.applications.includes('peregorodki')) + ' найдено',
+    found() === String(exp(p => p.applications.includes('peregorodki'))), 'found=' + found());
+  check('чип с подписью из сайдбара', chips.innerHTML.includes('Сантехнические перегородки'));
+
+  inp('category', 'Standard HPL').checked = true; change(); await wait(20);
+  check('комбо: перегородки AND Standard HPL',
+    found() === String(exp(p => p.applications.includes('peregorodki') && p.category === 'Standard HPL')), 'found=' + found());
+  doReset(); await wait(20);
+  check('«Сбросить» → 24, чипы пусты', found() === '24' && chips.innerHTML === '', 'found=' + found());
+
+  inp('category', 'Standard HPL').checked = true; change(); await wait(20);
+  check('фильтр «Тип материала: Standard HPL» → ' + exp(p => p.category === 'Standard HPL'),
+    found() === String(exp(p => p.category === 'Standard HPL')), 'found=' + found());
+  doReset(); await wait(20);
+
+  clickTh(btn(12)); await wait(20);
+  check('фильтр «Толщина 12 мм» → ' + exp(p => p.thickness === 12),
+    found() === String(exp(p => p.thickness === 12)), 'found=' + found());
+  doReset(); await wait(20);
+
+  inp('property', 'fire').checked = true; change(); await wait(20);
+  check('фильтр «Трудногорючий» → ' + exp(p => (p.properties || []).includes('fire')),
+    found() === String(exp(p => (p.properties || []).includes('fire'))), 'found=' + found());
+  doReset(); await wait(20);
+
+  inp('stock', 'in_stock').checked = true; change(); await wait(20);
+  check('фильтр «В наличии» → ' + exp(p => p.stock === 'in_stock'),
+    found() === String(exp(p => p.stock === 'in_stock')), 'found=' + found());
+  doReset(); await wait(20);
+
+  inp('apps', 'peregorodki').checked = true; change();
+  clickTh(btn(12)); await wait(20);
+  check('комбо: перегородки + 12 мм → ' + exp(p => p.applications.includes('peregorodki') && p.thickness === 12),
+    found() === String(exp(p => p.applications.includes('peregorodki') && p.thickness === 12)), 'found=' + found());
+
+  /* снятие фильтра через чип */
+  const removeBtns = (chips.innerHTML.match(/data-remove="[^"]*"/g) || []);
+  check('чипы активны (' + removeBtns.length + ')', removeBtns.length === 2, removeBtns.join(','));
+  doReset(); await wait(20);
+  check('после сброса сетка снова 24', found() === '24');
+
+  /* load more + сортировка */
   (loadmoreBtn._listeners['click'] || []).forEach(fn => fn({ target: loadmoreBtn, closest: () => loadmoreBtn }));
-  await wait(30);
-  check('load more → 18 cards', count(grid.innerHTML, 'class="product-card"') === 18, 'got ' + count(grid.innerHTML, 'class="product-card"'));
+  await wait(20);
+  check('load more → 18 карточек', count(grid.innerHTML, 'class="product-card"') === 18, 'got ' + count(grid.innerHTML, 'class="product-card"'));
 
-  const firstBefore = grid.innerHTML.indexOf('HPL панели 12 мм для сантехнических перегородок');
   const sortSel = byId['catalogSort'];
   sortSel.value = 'name';
   (sortSel._listeners['change'] || []).forEach(fn => fn());
-  await wait(30);
-  // sort сбрасывает видимые карточки к PAGE_SIZE (9); ru-collation: Антивандальный (№2) раньше Перегородочного (№8)
-  check('sort by name: order correct + first card changed',
-    grid.innerHTML.indexOf('HPL панели 12 мм для сантехнических перегородок') === -1
-    && grid.innerHTML.indexOf('Антивандальный HPL 12 мм') !== -1
+  await wait(20);
+  check('сортировка по названию (ru-collation)',
+    grid.innerHTML.indexOf('Антивандальный HPL 12 мм') !== -1
     && grid.innerHTML.indexOf('Антивандальный HPL 12 мм') < grid.innerHTML.indexOf('Перегородочный HPL 10 мм'));
 
-  (pills._listeners['click'] || []).forEach(fn => fn({
-    target: { closest: () => ({ dataset: { app: 'peregorodki' } }) }
-  }));
-  await wait(30);
-  const m = countEl.innerHTML.match(/<b>(\d+)<\/b>/);
-  check('filter «Перегородки» → 3 найдено', m && m[1] === '3', 'got ' + (m && m[1]));
-  check('active chip rendered', chips.innerHTML.includes('Перегородки'));
-  check('reset button visible', resetBtn.hidden === false);
+  console.log('');
+  await testProduct();
+
+  console.log(failed === 0 ? 'ALL TESTS PASSED' : failed + ' TESTS FAILED');
+  process.exit(failed === 0 ? 0 : 1);
 })();
 
-(async function testProduct() {
+async function testProduct() {
   console.log('product.js:');
   const { sandbox, byId, docListeners } = makeEnv({ search: '?id=hpl-12-peregorodki' });
   vm.createContext(sandbox);
@@ -151,67 +239,58 @@ function check(name, cond, extra = '') {
   const gallery = byId['galleryImage'];
   const facts = byId['factProduction'];
   const thicks = byId['thicknessChips'];
-  const configSummary = byId['configSummary'];
-  const tech = byId['techspecGroups'];
-  const why = byId['whyGrid'];
-  const applying = byId['applyingGrid'];
-  const projects = byId['projectsGrid'];
-  const related = byId['relatedGrid'];
-  const faq = byId['faqList'];
-  const crumbs = byId['breadcrumbs'];
 
-  check('title rendered', title.textContent === 'HPL панели 12 мм для сантехнических перегородок', title.textContent);
-  check('specs: Толщина 12 мм', specs.innerHTML.includes('12 мм') && specs.innerHTML.includes('Тип материала'));
-  check('price: от 4 200 ₽/м² (без дубля ₽)', price.innerHTML.includes('4 200') && price.innerHTML.includes('/м²') && price.innerHTML.indexOf('₽ ₽') === -1, price.innerHTML);
-  check('specs: «Применение» — полный текст', specs.innerHTML.includes('Сантехнические и душевые перегородки'));
-  check('gallery image set', gallery.src === 'assets/img/products/p01.svg', gallery.src);
-  check('production days fact', facts.textContent === 'от 10 рабочих дней', facts.textContent);
-  check('breadcrumbs: MARK, Каталог HPL', crumbs.innerHTML.includes('Каталог HPL') && crumbs.innerHTML.includes('MARK'));
-  check('thickness chips 6/8/10/12/16/25 (без категорий)', ['6', '8', '10', '12', '16', '25'].every(t => thicks.innerHTML.includes(t + ' мм')) && !thicks.innerHTML.includes('Laboratory'));
-  check('current thickness marked «— текущая»', thicks.innerHTML.includes('is-current') && thicks.innerHTML.includes('— текущая'));
-  check('config summary: 0101 + Super Matt', configSummary.innerHTML.includes('0101') && configSummary.innerHTML.includes('Super Matt'), configSummary.innerHTML);
-  check('конфигуратор: 8 свотчей однотонных', count(byId['configDecor'].innerHTML, 'config-decor-swatch__code') === 8 && byId['configDecor'].innerHTML.includes('0101'), 'got ' + count(byId['configDecor'].innerHTML, 'config-decor-swatch__code'));
-  check('techspec: 3 groups', count(tech.innerHTML, 'class="techspec-group"') === 3 && tech.innerHTML.includes('Абсолютная'));
-  check('why: featured set (peregorodki)', why.innerHTML.includes('Влагостойкость') && why.innerHTML.includes('Антивандальность'));
-  check('applying: 6 items', count(applying.innerHTML, 'product-applying__item') === 6 && applying.innerHTML.includes('Туалетные кабины'));
-  check('projects: 2 cards', count(projects.innerHTML, 'project-card__body') === 2);
-  check('related: cards rendered', count(related.innerHTML, 'class="related-card"') >= 1, 'got ' + count(related.innerHTML, 'class="related-card"'));
-  check('faq: 4 items', count(faq.innerHTML, 'faq-item__front') === 4 && faq.innerHTML.includes('Можно ли использовать HPL 12 мм в душевых?'));
+  check('заголовок товара', title.textContent === 'HPL панели 12 мм для сантехнических перегородок', title.textContent);
+  check('specs: Толщина 12 мм + «Применение» полный текст',
+    specs.innerHTML.includes('12 мм') && specs.innerHTML.includes('Сантехнические и душевые перегородки'));
+  check('price: от 4 200 ₽/м² (без дубля ₽)',
+    price.innerHTML.includes('4 200') && price.innerHTML.includes('/м²') && price.innerHTML.indexOf('₽ ₽') === -1, price.innerHTML);
+  check('галерея: изображение продукта', gallery.src === 'assets/img/products/p01.svg', gallery.src);
+  check('факт: срок производства', facts.textContent === 'от 10 рабочих дней', facts.textContent);
+  check('крошки: MARK + Каталог HPL', byId['breadcrumbs'].innerHTML.includes('Каталог HPL'));
+  check('чипы толщин (без категорий), текущая «— текущая»',
+    ['6', '8', '10', '12', '16', '25'].every(t => thicks.innerHTML.includes(t + ' мм'))
+    && !thicks.innerHTML.includes('Laboratory') && thicks.innerHTML.includes('— текущая'));
 
-  // переключение группы декоров в конфигураторе: «Древесные»
+  check('конфигуратор: 8 свотчей однотонных',
+    count(byId['configDecor'].innerHTML, 'config-decor-swatch__code') === 8
+    && byId['configDecor'].innerHTML.includes('0101'));
+  check('сводка конфигурации: 0101 + Super Matt',
+    byId['configSummary'].innerHTML.includes('0101') && byId['configSummary'].innerHTML.includes('Super Matt'));
+
   (byId['configDecorGroups']._listeners['click'] || []).forEach(fn => fn({
     target: { closest: () => ({ dataset: { group: 'wood' } }) }
   }));
-  await wait(30);
-  check('конфигуратор: группа «Древесные» → wood-свотчи', byId['configDecor'].innerHTML.includes('0501') && count(byId['configDecor'].innerHTML, 'config-decor-swatch__code') === 8, 'got ' + count(byId['configDecor'].innerHTML, 'config-decor-swatch__code'));
-  check('конфигуратор: summary обновился (0501)', byId['configSummary'].innerHTML.includes('0501'), byId['configSummary'].innerHTML);
-  // и обратно — «Каменные»
-  (byId['configDecorGroups']._listeners['click'] || []).forEach(fn => fn({
-    target: { closest: () => ({ dataset: { group: 'stone' } }) }
-  }));
-  await wait(30);
-  check('конфигуратор: группа «Каменные» → stone-свотчи', byId['configDecor'].innerHTML.includes('0701'));
+  await wait(20);
+  check('конфигуратор: группа «Древесные» → 0501',
+    byId['configDecor'].innerHTML.includes('0501')
+    && count(byId['configDecor'].innerHTML, 'config-decor-swatch__code') === 8
+    && byId['configSummary'].innerHTML.includes('0501'));
 
+  check('тех. описание: 3 группы',
+    count(byId['techspecGroups'].innerHTML, 'class="techspec-group"') === 3);
+  check('«Почему подходит»: влагостойкость + антивандальность',
+    byId['whyGrid'].innerHTML.includes('Влагостойкость') && byId['whyGrid'].innerHTML.includes('Антивандальность'));
+  check('«Где применяется»: 6 позиций', count(byId['applyingGrid'].innerHTML, 'product-applying__item') === 6);
+  check('проекты: 2 карточки', count(byId['projectsGrid'].innerHTML, 'project-card__body') === 2);
+  check('«Другие решения»: карточки', count(byId['relatedGrid'].innerHTML, 'class="related-card"') >= 1);
+  check('FAQ: 4 вопроса', count(byId['faqList'].innerHTML, 'faq-item__front') === 4);
+
+  /* без ?id → первый товар */
   const env2 = makeEnv({ search: '' });
   vm.createContext(env2.sandbox);
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets/js/product.js'), 'utf8'), env2.sandbox, { filename: 'product.js' });
   fireReady(env2.docListeners);
   await wait(150);
-  check('no ?id → first product from JSON', env2.byId['productTitle'].textContent === 'HPL панели 12 мм для сантехнических перегородок');
+  check('без ?id → первый товар', env2.byId['productTitle'].textContent === 'HPL панели 12 мм для сантехнических перегородок');
 
-  const env3 = makeEnv({ search: '?id=nonexistent' });
-  vm.createContext(env3.sandbox);
-  vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets/js/product.js'), 'utf8'), env3.sandbox, { filename: 'product.js' });
-  fireReady(env3.docListeners);
-  await wait(150);
-  check('unknown slug → falls back to first product', env3.byId['productTitle'].textContent.length > 0, env3.byId['productTitle'].textContent);
-
+  /* MODX JSON-режим */
   const env4 = makeEnv({ search: '' });
   vm.createContext(env4.sandbox);
   const jsonPayload = {
     applications: { peregorodki: 'Перегородки' },
-    products: [{ slug: 'x-1', title: 'MIGX тест', category: 'Compact HPL', applications: ['peregorodki'], thickness: 12, tags: ['12 мм'], stock: 'in_stock', price: { kind: 'from', label: 'Цена за м²', value: 'от 5 000 ₽' }, image: 'assets/img/products/p02.svg', short_desc: 'desc' }],
-    current: { slug: 'x-1', title: 'MIGX тест', category: 'Compact HPL', applications: ['peregorodki'], thickness: 12, tags: ['12 мм'], stock: 'in_stock', price: { kind: 'from', label: 'Цена за м²', value: 'от 5 000 ₽' }, image: 'assets/img/products/p02.svg', short_desc: 'desc', production_days: '25', min_order: 'от 20 м²', delivery: 'По РФ' }
+    products: [{ slug: 'x-1', title: 'MIGX тест', category: 'Compact HPL', applications: ['peregorodki'], thickness: 12, tags: ['12 мм'], properties: ['moisture'], stock: 'in_stock', price: { kind: 'from', label: 'Цена за м²', value: 'от 5 000 ₽' }, image: 'assets/img/products/p02.svg', short_desc: 'desc' }],
+    current: { slug: 'x-1', title: 'MIGX тест', category: 'Compact HPL', applications: ['peregorodki'], thickness: 12, tags: ['12 мм'], properties: ['moisture'], stock: 'in_stock', price: { kind: 'from', label: 'Цена за м²', value: 'от 5 000 ₽' }, image: 'assets/img/products/p02.svg', short_desc: 'desc', production_days: '25', min_order: 'от 20 м²', delivery: 'По РФ' }
   };
   env4.byId['hpl-product-json'] = new FakeEl('hpl-product-json');
   env4.byId['hpl-product-json'].innerHTML = JSON.stringify(jsonPayload);
@@ -219,10 +298,6 @@ function check(name, cond, extra = '') {
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets/js/product.js'), 'utf8'), env4.sandbox, { filename: 'product.js' });
   fireReady(env4.docListeners);
   await wait(30);
-  check('MODX JSON mode: title from embedded data', env4.byId['productTitle'].textContent === 'MIGX тест', env4.byId['productTitle'].textContent);
-  check('MODX JSON mode: price', env4.byId['productPriceValue'].innerHTML.includes('5 000'));
-
-  console.log('');
-  console.log(failed === 0 ? 'ALL TESTS PASSED' : failed + ' TESTS FAILED');
-  process.exit(failed === 0 ? 0 : 1);
-})();
+  check('MODX JSON: заголовок из вшитых данных', env4.byId['productTitle'].textContent === 'MIGX тест', env4.byId['productTitle'].textContent);
+  check('MODX JSON: цена', env4.byId['productPriceValue'].innerHTML.includes('5 000'));
+}

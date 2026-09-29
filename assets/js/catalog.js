@@ -1,17 +1,25 @@
 /* ==========================================================================
-   Каталог HPL — фильтрация, сортировка, "загрузить еще"
+   Каталог HPL — фильтры (сайдбар слева), сортировка, "загрузить еще"
    Тестовый бэкенд: data/products.json (аналог MIGX-грида на MODX,
    см. modx/README.md и modx/snippets/snGetHplProducts.php)
+
+   Формы данных (обязательные поля товара):
+     slug, title, category, applications[], thickness, tags[],
+     stock, price{kind,label,value}, image, properties[]
+   properties: fire | biocidal | chemical | moisture
    ========================================================================== */
 (function () {
   'use strict';
 
   var PAGE_SIZE = 9;
+  var STOCK_LABELS = { in_stock: 'В наличии', under_order: 'Под заказ', request: 'По запросу' };
+
   var state = {
     data: null,
-    apps: {},            // key -> label
+    appLabels: {},    // ключ сферы -> подпись (читаются из сайдбара)
+    propLabels: {},   // ключ свойства -> подпись (читаются из сайдбара)
     products: [],
-    selected: [],        // выбранные сферы (ключи)
+    filters: { apps: [], category: [], thickness: [], property: [], stock: [] },
     sort: 'recommended',
     visible: PAGE_SIZE
   };
@@ -51,15 +59,15 @@
            '<span class="product-card__price-value">' + esc(p.price.value) + '</span>';
   }
 
-  /* ---------- Карточка товара ----------
-     data-* атрибуты используются в MODX-режиме: snippet рендерит карточки
-     на сервере (чанк hpl-product-card), и JS фильтрует уже готовый DOM. */
   /* Ссылка на карточку товара: в MODX её отдаёт snippet (поле url),
      в Netlify-версии — product.html?id=slug */
   function productUrl(p) {
     return p.href || ('product.html?id=' + encodeURIComponent(p.slug));
   }
 
+  /* ---------- Карточка товара ----------
+     data-* атрибуты используются в MODX-режиме: snippet рендерит карточки
+     на сервере (чанк hpl-product-card), и JS фильтрует уже готовый DOM. */
   function cardDataAttrs(p) {
     return ' data-id="' + (p.id || 0) + '"' +
       ' data-slug="' + esc(p.slug) + '"' +
@@ -71,6 +79,7 @@
       ' data-tags="' + esc((p.tags || []).join('|')) + '"' +
       ' data-image="' + esc(p.image || '') + '"' +
       ' data-stock="' + esc(p.stock || '') + '"' +
+      ' data-properties="' + esc((p.properties || []).join('|')) + '"' +
       ' data-price-kind="' + esc((p.price && p.price.kind) || '') + '"' +
       ' data-price-label="' + esc((p.price && p.price.label) || '') + '"' +
       ' data-price-value="' + esc((p.price && p.price.value) || '') + '"' +
@@ -85,7 +94,6 @@
     var badge = s.label
       ? '<span class="product-card__badge ' + s.cls + '">' + s.label + '</span>'
       : '';
-    // Второй бейдж на изображении: пожарный класс (как в макете: KM1)
     var fireBadge = p.fire_class
       ? '<span class="product-card__fire-badge">' + esc(p.fire_class) + '</span>'
       : '';
@@ -114,16 +122,69 @@
       '</article>';
   }
 
-  /* ---------- Фитринг / сортировка ---------- */
+  /* ---------- Чтение фильтров из сайдбара (единый источник — DOM) ---------- */
+  function readFilters() {
+    var f = { apps: [], category: [], thickness: [], property: [], stock: [] };
+    els.filterInputs.forEach(function (inp) {
+      if (inp.checked && f[inp.dataset.filter]) {
+        f[inp.dataset.filter].push(inp.value);
+      }
+    });
+    els.thicknessButtons.forEach(function (b) {
+      if (b.classList.contains('is-active')) {
+        f.thickness.push(parseInt(b.dataset.value, 10));
+      }
+    });
+    f.thickness.sort(function (a, b) { return a - b; });
+    state.filters = f;
+  }
+
+  function readLabels() {
+    state.appLabels = {};
+    state.propLabels = {};
+    els.filterInputs.forEach(function (inp) {
+      var label = '';
+      if (inp.parentElement) {
+        label = (inp.parentElement.textContent || '').trim();
+      }
+      if (inp.dataset.filter === 'apps') state.appLabels[inp.value] = label || inp.value;
+      if (inp.dataset.filter === 'property') state.propLabels[inp.value] = label || inp.value;
+    });
+  }
+
+  function clearFilterDom() {
+    els.filterInputs.forEach(function (inp) { inp.checked = false; });
+    els.thicknessButtons.forEach(function (b) { b.classList.remove('is-active'); });
+  }
+
+  function activeFilterCount() {
+    var f = state.filters;
+    return f.apps.length + f.category.length + f.thickness.length + f.property.length + f.stock.length;
+  }
+
+  /* ---------- Фильтрация / сортировка ---------- */
   function filtered() {
     var list = state.products.slice();
+    var f = state.filters;
 
-    if (state.selected.length) {
+    if (f.apps.length) {
       list = list.filter(function (p) {
-        return state.selected.some(function (k) {
-          return (p.applications || []).indexOf(k) !== -1;
-        });
+        return f.apps.some(function (k) { return (p.applications || []).indexOf(k) !== -1; });
       });
+    }
+    if (f.category.length) {
+      list = list.filter(function (p) { return f.category.indexOf(p.category) !== -1; });
+    }
+    if (f.thickness.length) {
+      list = list.filter(function (p) { return f.thickness.indexOf(p.thickness) !== -1; });
+    }
+    if (f.property.length) {
+      list = list.filter(function (p) {
+        return f.property.some(function (k) { return (p.properties || []).indexOf(k) !== -1; });
+      });
+    }
+    if (f.stock.length) {
+      list = list.filter(function (p) { return f.stock.indexOf(p.stock) !== -1; });
     }
 
     switch (state.sort) {
@@ -142,56 +203,45 @@
     return list;
   }
 
-  /* ---------- Рендер ---------- */
-  function bindPills() {
-    els.pills.addEventListener('click', function (e) {
-      var btn = e.target.closest('.catalog-pill');
-      if (!btn) return;
-      var app = btn.dataset.app;
-      if (app === 'all') {
-        state.selected = [];
-      } else {
-        var i = state.selected.indexOf(app);
-        if (i === -1) state.selected.push(app);
-        else state.selected.splice(i, 1);
-      }
-      state.visible = PAGE_SIZE;
-      render();
-    });
+  /* ---------- Чипы активных фильтров ---------- */
+  function chipLabel(group, value) {
+    switch (group) {
+      case 'apps': return state.appLabels[value] || value;
+      case 'category': return value;
+      case 'thickness': return value + ' мм';
+      case 'property': return state.propLabels[value] || value;
+      case 'stock': return STOCK_LABELS[value] || value;
+      default: return value;
+    }
   }
 
-  function render() {
-    // пилюли: подсветка
-    els.pills.querySelectorAll('.catalog-pill').forEach(function (btn) {
-      var app = btn.dataset.app;
-      var active = app === 'all' ? state.selected.length === 0 : state.selected.indexOf(app) !== -1;
-      btn.classList.toggle('is-active', active);
+  function renderChips() {
+    var f = state.filters;
+    var html = '';
+    ['apps', 'category', 'thickness', 'property', 'stock'].forEach(function (group) {
+      f[group].forEach(function (value) {
+        html += '<span class="catalog-chip">' + esc(chipLabel(group, value)) +
+                '<button type="button" data-remove="' + esc(group + '|' + value) + '" aria-label="Убрать фильтр"></button></span>';
+      });
     });
+    els.chips.innerHTML = html;
+  }
+
+  /* ---------- Рендер ---------- */
+  function render() {
+    readFilters();
 
     var list = filtered();
 
-    // счётчик
     els.count.innerHTML = 'Найдено <b>' + list.length + '</b> ' +
       plural(list.length, 'решение', 'решения', 'решений');
 
-    // чипы активных фильтров
-    if (state.selected.length) {
-      els.chips.innerHTML = state.selected.map(function (k) {
-        return '<span class="catalog-chip">' + esc(state.apps[k] || k) +
-               '<button type="button" data-remove="' + esc(k) + '" aria-label="Убрать фильтр"></button></span>';
-      }).join('');
-      els.reset.hidden = false;
-    } else {
-      els.chips.innerHTML = '';
-      els.reset.hidden = true;
-    }
+    renderChips();
 
-    // сетка
     var shown = list.slice(0, state.visible);
     els.grid.innerHTML = shown.map(cardHtml).join('');
     els.empty.hidden = list.length !== 0;
 
-    // загрузить еще
     var left = list.length - shown.length;
     els.loadmore.hidden = left <= 0;
     if (left > 0) {
@@ -199,23 +249,9 @@
     }
   }
 
-  /* Генерация пилюль (только для Netlify-режима; в MODX пилюли рендерятся сервером).
-     Порядок как в макете: сферы, затем «Все сферы» (в конце).
-     Ключ «vse» из справочника не рендерим отдельной пилюлей — это и есть «Все сферы». */
-  function renderPills() {
-    var html = '';
-    Object.keys(state.apps).forEach(function (k) {
-      if (k === 'vse') return;
-      html += '<button class="catalog-pill" type="button" data-app="' + esc(k) + '">' + esc(state.apps[k]) + '</button>';
-    });
-    html += '<button class="catalog-pill is-active" type="button" data-app="all">Все сферы</button>';
-    els.pills.innerHTML = html;
-    bindPills();
-  }
-
   /* ---------- Запуск ---------- */
   function init() {
-    els.pills = document.getElementById('catalogPills');
+    els.filtersBox = document.getElementById('catalogFilters');
     els.grid = document.getElementById('catalogGrid');
     els.count = document.getElementById('catalogCount');
     els.chips = document.getElementById('catalogChips');
@@ -224,21 +260,73 @@
     els.loadmore = document.getElementById('catalogLoadmore');
     els.loadmoreNote = document.getElementById('catalogLoadmoreNote');
     els.sort = document.getElementById('catalogSort');
+    els.filtersMore = document.querySelector('.js-filters-more');
+    els.filtersExtra = document.getElementById('catalogFiltersExtra');
 
-    if (!els.pills || !els.grid) return;
+    if (!els.grid) return;
 
+    /* Сборка списка фильтров (сайдбар статичный — одинаков в обоих режимах) */
+    els.filterInputs = els.filtersBox
+      ? Array.prototype.slice.call(els.filtersBox.querySelectorAll('input[data-filter]'))
+      : [];
+    els.thicknessButtons = els.filtersBox
+      ? Array.prototype.slice.call(els.filtersBox.querySelectorAll('.thickness-toggle'))
+      : [];
+    readLabels();
+
+    /* Чекбоксы: change на контейнере (делегирование) */
+    if (els.filtersBox) {
+      els.filtersBox.addEventListener('change', function () {
+        state.visible = PAGE_SIZE;
+        render();
+      });
+
+      /* Толщина: кнопки-переключатели */
+      els.filtersBox.addEventListener('click', function (e) {
+        var btn = e.target.closest ? e.target.closest('.thickness-toggle') : null;
+        if (!btn) return;
+        btn.classList.toggle('is-active');
+        state.visible = PAGE_SIZE;
+        render();
+      });
+    }
+
+    /* Сбросить (шапка сайдбара) */
+    if (els.reset) {
+      els.reset.addEventListener('click', function () {
+        clearFilterDom();
+        state.visible = PAGE_SIZE;
+        render();
+      });
+    }
+
+    /* «Дополнительные параметры» */
+    if (els.filtersMore && els.filtersExtra) {
+      els.filtersMore.addEventListener('click', function () {
+        var open = els.filtersExtra.hidden;
+        els.filtersExtra.hidden = !open;
+        els.filtersMore.classList.toggle('is-open', open);
+        els.filtersMore.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    }
+
+    /* Чипы: снять фильтр */
     els.chips.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-remove]');
+      var btn = e.target.closest ? e.target.closest('[data-remove]') : null;
       if (!btn) return;
-      var k = btn.dataset.remove;
-      var i = state.selected.indexOf(k);
-      if (i !== -1) state.selected.splice(i, 1);
-      state.visible = PAGE_SIZE;
-      render();
-    });
+      var parts = btn.dataset.remove.split('|');
+      var group = parts[0];
+      var value = parts.slice(1).join('|');
 
-    els.reset.addEventListener('click', function () {
-      state.selected = [];
+      if (group === 'thickness') {
+        els.thicknessButtons.forEach(function (b) {
+          if (parseInt(b.dataset.value, 10) === parseInt(value, 10)) b.classList.remove('is-active');
+        });
+      } else {
+        els.filterInputs.forEach(function (inp) {
+          if (inp.dataset.filter === group && inp.value === value) inp.checked = false;
+        });
+      }
       state.visible = PAGE_SIZE;
       render();
     });
@@ -254,7 +342,7 @@
       render();
     });
 
-    /* МОД-X режим: карточки и пилюли уже отрендерены snippet'ом
+    /* MODX-режим: карточки уже отрендерены snippet'ом
        (snGetHplProducts + чанк hpl-product-card) — работаем с DOM. */
     var domCards = els.grid.querySelectorAll('.product-card[data-slug]');
     if (domCards.length) {
@@ -270,16 +358,12 @@
           tags: (d.tags || '').split('|').filter(Boolean),
           image: d.image,
           stock: d.stock,
+          properties: (d.properties || '').split('|').filter(Boolean),
           href: d.href || null,
           fire_class: d.fireClass || '',
           price: d.priceValue ? { kind: d.priceKind, label: d.priceLabel, value: d.priceValue } : null
         };
       });
-      els.pills.querySelectorAll('.catalog-pill[data-app]').forEach(function (btn) {
-        var k = btn.dataset.app;
-        if (k !== 'all') state.apps[k] = btn.textContent.trim();
-      });
-      bindPills();
       render();
       return;
     }
@@ -292,9 +376,7 @@
       })
       .then(function (data) {
         state.data = data;
-        state.apps = data.applications || {};
         state.products = data.products || [];
-        renderPills();
         render();
       })
       .catch(function (err) {

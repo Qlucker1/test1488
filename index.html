@@ -103,41 +103,103 @@
           <p class="catalog-intro__desc">Подберите HPL по применению, типу материала, толщине и характеристикам.</p>
         </section>
 
-        <!-- Фильтр по применению -->
-        <section class="catalog-filter" aria-label="Фильтр по применению">
-          <span class="catalog-filter__label">Подберите HPL по применению</span>
-          <div class="catalog-filter__pills" id="catalogPills"><!-- JS --></div>
-        </section>
+        <!-- ============ Фильтры (слева) + каталог (справа) ============ -->
+        <div class="catalog-layout">
 
-        <!-- Панель результатов -->
-        <div class="catalog-toolbar">
-          <span class="catalog-toolbar__count" id="catalogCount">Найдено <b>…</b> решений</span>
-          <div class="catalog-chips" id="catalogChips"><!-- JS: активные фильтры --></div>
-          <button class="catalog-reset js-reset" type="button" hidden>Сбросить все</button>
-          <div class="catalog-sort">
-            <span>Сортировка:</span>
-            <select id="catalogSort" aria-label="Сортировка">
-              <option value="recommended">Сначала рекомендуемые</option>
-              <option value="thickness">По толщине</option>
-              <option value="name">По названию</option>
-            </select>
-          </div>
-        </div>
+          <!-- Сайдбар фильтров -->
+          <aside class="catalog-filters" id="catalogFilters" aria-label="Фильтры каталога">
+            <div class="catalog-filters__head">
+              <h2 class="catalog-filters__title">Фильтры</h2>
+              <button class="catalog-filters__reset js-reset" type="button">Сбросить</button>
+            </div>
 
-        <!-- Сетка карточек -->
-        <section class="catalog-grid" id="catalogGrid" aria-label="Список товаров"></section>
+            <div class="catalog-filters__group">
+              <h3 class="catalog-filters__label">Применение</h3>
+              <label class="check"><input type="checkbox" data-filter="apps" value="faades"><span class="check__box"></span>Фасады</label>
+              <label class="check"><input type="checkbox" data-filter="apps" value="peregorodki"><span class="check__box"></span>Сантехнические перегородки</label>
+              <label class="check"><input type="checkbox" data-filter="apps" value="laboratorii"><span class="check__box"></span>Чистые помещения</label>
+              <label class="check"><input type="checkbox" data-filter="apps" value="medicina"><span class="check__box"></span>Медицинские учреждения</label>
+              <label class="check"><input type="checkbox" data-filter="apps" value="orientka"><span class="check__box"></span>Интерьерная отделка</label>
+              <label class="check"><input type="checkbox" data-filter="apps" value="mebel"><span class="check__box"></span>Мебель</label>
+              <label class="check"><input type="checkbox" data-filter="apps" value="transport"><span class="check__box"></span>Транспорт</label>
+            </div>
 
-        <!-- Пусто -->
-        <div class="catalog-empty" id="catalogEmpty" hidden>
-          <b>Ничего не найдено</b>
-          Попробуйте выбрать другую сферу применения или сбросьте фильтры.
-        </div>
+            <div class="catalog-filters__group">
+              <h3 class="catalog-filters__label">Тип материала</h3>
+              <label class="check"><input type="checkbox" data-filter="category" value="Compact HPL"><span class="check__box"></span>Compact HPL</label>
+              <label class="check"><input type="checkbox" data-filter="category" value="Standard HPL"><span class="check__box"></span>Standard HPL</label>
+              <label class="check"><input type="checkbox" data-filter="category" value="Facade HPL"><span class="check__box"></span>Facade HPL</label>
+              <label class="check"><input type="checkbox" data-filter="category" value="Laboratory HPL"><span class="check__box"></span>Laboratory HPL</label>
+            </div>
 
-        <!-- Загрузить еще -->
-        <div class="catalog-loadmore" id="catalogLoadmore" hidden>
-          <div>
-            <button class="border-red-button js-loadmore" type="button">Загрузить еще</button>
-            <div class="catalog-loadmore__note" id="catalogLoadmoreNote"></div>
+            <div class="catalog-filters__group">
+              <h3 class="catalog-filters__label">Толщина</h3>
+              <div class="catalog-filters__thickness">
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="4">4 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="6">6 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="8">8 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="10">10 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="12">12 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="16">16 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="25">25 мм</button>
+              </div>
+            </div>
+
+            <div class="catalog-filters__group">
+              <h3 class="catalog-filters__label">Специальные свойства</h3>
+              <label class="check"><input type="checkbox" data-filter="property" value="fire"><span class="check__box"></span>Трудногорючий</label>
+              <label class="check"><input type="checkbox" data-filter="property" value="biocidal"><span class="check__box"></span>Биоцидный</label>
+              <label class="check"><input type="checkbox" data-filter="property" value="chemical"><span class="check__box"></span>Химически стойкий</label>
+              <label class="check"><input type="checkbox" data-filter="property" value="moisture"><span class="check__box"></span>Влагостойкий</label>
+            </div>
+
+            <button class="catalog-filters__more js-filters-more" type="button" aria-expanded="false">
+              <span class="catalog-filters__more-icon">+</span>Дополнительные параметры
+            </button>
+            <div class="catalog-filters__extra" id="catalogFiltersExtra" hidden>
+              <div class="catalog-filters__group">
+                <h3 class="catalog-filters__label">Наличие</h3>
+                <label class="check"><input type="checkbox" data-filter="stock" value="in_stock"><span class="check__box"></span>В наличии</label>
+                <label class="check"><input type="checkbox" data-filter="stock" value="under_order"><span class="check__box"></span>Под заказ</label>
+                <label class="check"><input type="checkbox" data-filter="stock" value="request"><span class="check__box"></span>По запросу</label>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Контент каталога -->
+          <div class="catalog-main">
+
+            <!-- Панель результатов -->
+            <div class="catalog-toolbar">
+              <span class="catalog-toolbar__count" id="catalogCount">Найдено <b>…</b> решений</span>
+              <div class="catalog-chips" id="catalogChips"><!-- JS: активные фильтры --></div>
+              <div class="catalog-sort">
+                <span>Сортировка:</span>
+                <select id="catalogSort" aria-label="Сортировка">
+                  <option value="recommended">Сначала рекомендуемые</option>
+                  <option value="thickness">По толщине</option>
+                  <option value="name">По названию</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Сетка карточек -->
+            <section class="catalog-grid" id="catalogGrid" aria-label="Список товаров"></section>
+
+            <!-- Пусто -->
+            <div class="catalog-empty" id="catalogEmpty" hidden>
+              <b>Ничего не найдено</b>
+              Попробуйте изменить параметры фильтров.
+            </div>
+
+            <!-- Загрузить еще -->
+            <div class="catalog-loadmore" id="catalogLoadmore" hidden>
+              <div>
+                <button class="border-red-button js-loadmore" type="button">Загрузить еще</button>
+                <div class="catalog-loadmore__note" id="catalogLoadmoreNote"></div>
+              </div>
+            </div>
+
           </div>
         </div>
 

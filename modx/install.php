@@ -263,6 +263,7 @@ if ($container) {
                     'application_text' => isset($p['application_text']) ? $p['application_text'] : '',
                     'fire_class'       => isset($p['fire_class']) ? $p['fire_class'] : '',
                     'thickness'        => (int)$p['thickness'],
+                    'properties'       => isset($p['properties']) ? implode('|', $p['properties']) : '',
                     'tags'             => implode('|', $p['tags']),
                     'stock'            => $p['stock'],
                     'price_kind'       => $p['price']['kind'],

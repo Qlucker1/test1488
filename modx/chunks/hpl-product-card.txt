@@ -14,6 +14,7 @@
   data-tags="[[+tags*]]"
   data-image="[[+image*]]"
   data-stock="[[+stock*]]"
+  data-properties="[[+properties*]]"
   data-price-kind="[[+price_kind*]]"
   data-price-label="[[+price_label*]]"
   data-price-value="[[+price_value*]]"

@@ -81,7 +81,19 @@
       "options": {}
     },
     {
-      "type": "selectbox",
+      "type": "listbox",
+      "class": "migx-col-2",
+      "name": "properties",
+      "caption": "Специальные свойства",
+      "description": "Фильтры каталога: «Специальные свойства»",
+      "options": {
+        "multiple": "1",
+        "options": "fire|biocidal|chemical|moisture",
+        "options_caption": "Трудногорючий|Биоцидный|Химически стойкий|Влагостойкий"
+      }
+    },
+    {
+      "type": "input",
       "class": "migx-col-1",
       "name": "stock",
       "caption": "Наличие",
