@@ -71,14 +71,21 @@ python3 -m http.server 8080
    `/assets/hpl_install.php?secret=лемарк2026&parent=<id раздела>`
    — создаются чанки (`style.css`, `catalog.css`, `product.css`, `header`, `footer`,
    `popups`, `hpl-product-card`, `hpl_products`), шаблоны `HPL Catalog`/`HPL Product`,
-   TV `hpl_products` + MIGX-конфиг, сниппеты `snGetHplProducts`/`snGetHplProduct`,
-   ресурс-контейнер `hpl-catalog-container` (заполнен тестовыми товарами) и демо-страницы.
+   TV `hpl_products` (MIGX) **+ 8 TV карточки товара `hpl_*`**, сниппеты
+   `snGetHplProducts`/`snGetHplProduct`, ресурс-контейнер `hpl-catalog-container`
+   (заполнен тестовыми товарами) и демо-страницы (у демо-товара TV уже заполнены).
 4. Проверить `/katalog-hpl/` и `/hpl-12-peregorodki/`.
 5. **Удалить `install.php`**.
 
-Дальше товары ведутся в **MIGX-гриде** на ресурсе `hpl-catalog-container`
-(вкладка «Свойства»); карточка товара = ресурс с шаблоном `HPL Product` и
-`alias` = полю `slug` грида.
+Дальше:
+* **Товары каталога** — в MIGX-гриде на ресурсе `hpl-catalog-container` (вкладка
+  «Свойства»).
+* **Карточка товара** — отдельный ресурс с шаблоном `HPL Product`, `alias` = полю
+  `slug` грида; **все характеристики заполняются TV** (`hpl_thickness`,
+  `hpl_thicknesses`, `hpl_category`, `hpl_application`, `hpl_decors`,
+  `hpl_processing`, `hpl_formats`, `hpl_techspec`) — что за что отвечает, формат
+  `hpl_techspec` и как создать TV вручную: [`modx/README.md` → «Переменные шаблона (TV)»](modx/README.md).
+  Сниппет `snGetHplProduct` (код) читает TV поверх MIGX и парсит списки.
 
 ### Ключевое решение по CSS
 
@@ -108,14 +115,28 @@ python3 -m http.server 8080
 
 `data/products.json` — 24 товара: 6 первых — карточки из макета 1, остальные —
 случайные варианты (фасады, медицина, лаборатории, транспорт, мебель, отделка).
-Поля товара: `id, slug, title, category, applications[], thickness, tags[],
-stock, price{kind,label,value}, image, short_desc, production_days, min_order, delivery`.
+
+Поля товара:
+* каталог/карточка: `id, slug, title, category, applications[], tags[], stock,
+  price{kind,label,value}, image, short_desc, production_days, min_order, delivery,
+  thickness, fire_class, properties[]`
+* **наполняемые характеристики карточки** (на MODX — это TV, см. ниже):
+  * `thicknesses[]` — все толщины → блок «Другие толщины»
+  * `category` — тип материала (свободный текст)
+  * `application_text` — применение (свободный текст)
+  * `decors` — декоры (свободный текст)
+  * `processing` — обработка (свободный текст)
+  * `formats[]` — форматы листа, 1–3 из `3050×1300`, `3050×1600`, `3050×1250`
+  * `techspec` — технические характеристики, текст в формате
+    `[Группа]` + `Параметр: значение` (парсер в `product.js`)
 
 Ключи сфер: `faades, peregorodki, medicina, laboratorii, orientka, mebel, transport, vse`.
 
 ## Тесты JS
 
-`tests/smoke_test.js` — Node-тесты логики (DOM-шим, браузер не нужен):
-рендер сетки, фильтры, сортировка, load-more, рендер карточки,
-конфигуратор (группы декоров), MODX-JSON-режим. Запуск: `node tests/smoke_test.js` (проходят на Node 18+).
-Прогоняйте после изменений `assets/js/*.js` или `data/products.json`.
+`tests/smoke_test.js` — Node-тесты логики (DOM-шим, браузер не нужно):
+рендер сетки, фильтры (плитки + сайдбар), сортировка, load-more, рендер карточки
+(наполняемые характеристики, «Другие толщины», парсинг `techspec`, конфигуратор
+с группами декоров), MODX-JSON-режим. Запуск: `node tests/smoke_test.js`
+(проходят на Node 18+). Прогоняйте после изменений `assets/js/*.js` или
+`data/products.json`.

@@ -65,7 +65,12 @@
   };
 
   var EMBOSSES = { MT: 'Super Matt (MT)', FG: 'Fine Grain (FG)', GL: 'Gloss (GL)' };
-  var FORMATS = { '3050×1320': '3050 × 1320 мм', '3050×1570': '3050 × 1570 мм' };
+  /* Каноны форматов листа (выбор 1–3 заводится в TV hpl_formats / MIGX) */
+  var FORMATS = {
+    '3050×1300': '3050 × 1300 мм',
+    '3050×1600': '3050 × 1600 мм',
+    '3050×1250': '3050 × 1250 мм'
+  };
   var PROCESSING = { none: 'Без обработки', cut: 'Раскрой', cnc: 'CNC обработка' };
 
   var INTERIORS = {
@@ -103,15 +108,24 @@
     return (state.data.applications && state.data.applications[key]) || key;
   }
 
+  /* Характеристики — все заполняемые (TV на MODX / поле в JSON):
+     thickness, thicknesses[], category, application_text, decors,
+     processing, formats[], techspec{groups[]} */
+  function formatsList(p) {
+    var f = (p.formats || []).filter(function (f) { return FORMATS[f]; });
+    return f.length ? f : Object.keys(FORMATS);
+  }
+
   function specsHtml(p) {
     var apps = (p.applications || []).map(appLabel).join(', ');
+    var fmts = formatsList(p).map(function (f) { return FORMATS[f]; });
     return '' +
       '<div class="product-specs__row"><dt>Толщина</dt><dd>' + esc(p.thickness) + ' мм</dd></div>' +
       '<div class="product-specs__row"><dt>Тип материала</dt><dd>' + esc(p.category) + '</dd></div>' +
       '<div class="product-specs__row"><dt>Применение</dt><dd>' + esc(p.application_text || apps || 'Универсальное') + '</dd></div>' +
-      '<div class="product-specs__row"><dt>Декоры</dt><dd>3156 / выбор из каталога</dd></div>' +
-      '<div class="product-specs__row"><dt>Обработка</dt><dd>Раскрой и CNC по запросу</dd></div>' +
-      '<div class="product-specs__row"><dt>Формат</dt><dd>3050 × 1320 мм, 3050 × 1570 мм</dd></div>';
+      '<div class="product-specs__row"><dt>Декоры</dt><dd>' + esc(p.decors || '3156 декоров / выбор из каталога') + '</dd></div>' +
+      '<div class="product-specs__row"><dt>Обработка</dt><dd>' + esc(p.processing || 'Раскрой и CNC по запросу') + '</dd></div>' +
+      '<div class="product-specs__row"><dt>Формат</dt><dd>' + esc(fmts.join(', ')) + '</dd></div>';
   }
 
   function priceHtml(p) {
@@ -176,30 +190,31 @@
     caption.textContent = p.category + ' • ' + p.thickness + ' мм';
   }
 
-  /* ---------- Другие толщины ---------- */
+  /* ---------- Другие толщины ----------
+     Варианты толщин заводит контент-менеджер (TV hpl_thicknesses /
+     поле thicknesses в JSON). Текущая толщина — p.thickness.
+     Если у товара один вариант — блок скрываем. */
   function renderThicknesses(p) {
-    var ths = [];
-    state.products.forEach(function (x) {
-      if (ths.indexOf(x.thickness) === -1) ths.push(x.thickness);
-    });
-    ths.sort(function (a, b) { return a - b; });
+    var ths = (p.thicknesses || []).map(Number).filter(Boolean).sort(function (a, b) { return a - b; });
+    var section = $id('thicknessSection');
+
+    if (ths.length <= 1) {
+      if (section) section.hidden = true;
+      els.thicknessChips.innerHTML = '';
+      return;
+    }
+    if (section) section.hidden = false;
 
     els.thicknessChips.innerHTML = ths.map(function (t) {
       if (t === p.thickness) {
         return '<span class="thickness-chip is-current">' + t + ' мм<small>— текущая</small></span>';
       }
-      // ищем товар этой толщины: сначала с пересекающейся сферой
-      var target = state.products.find(function (x) {
-        return x.thickness === t &&
-          x.applications.some(function (k) { return p.applications.indexOf(k) !== -1; });
-      }) || state.products.find(function (x) { return x.thickness === t; });
-      if (!target) return '';
-      return '<a class="thickness-chip" href="' + esc(productUrl(target)) + '">' + t + ' мм</a>';
+      return '<span class="thickness-chip">' + t + ' мм</span>';
     }).join('');
   }
 
   /* ---------- Конфигуратор ---------- */
-  var config = { decor: DECORS.solid.items[0], decorGroup: 'solid', emboss: 'MT', format: '3050×1320', processing: 'none' };
+  var config = { decor: DECORS.solid.items[0], decorGroup: 'solid', emboss: 'MT', format: '3050×1300', processing: 'none' };
 
   function renderConfigDecor(group) {
     config.decorGroup = group;
@@ -252,6 +267,14 @@
       });
     });
 
+    /* Стартовый формат листа — из данных товара (TV hpl_formats) */
+    var fmtBox = $id('configFormat');
+    if (fmtBox) {
+      fmtBox.querySelectorAll('.config-option').forEach(function (b) {
+        b.classList.toggle('is-selected', b.dataset.value === config.format);
+      });
+    }
+
     updateSummary();
   }
 
@@ -267,16 +290,55 @@
     }
   }
 
-  /* ---------- Технические характеристики ---------- */
+  /* ---------- Технические характеристики ----------
+     Заполняемые: TV hpl_techspec (MODX) / поле techspec (JSON).
+     Формат:
+       [Название группы]
+       Параметр: значение
+       Параметр: значение
+       (пустая строка — новый абзац)
+     Группы и строки — любые, количество не ограничено. */
+  function parseTechspec(src) {
+    var groups = [];
+    var cur = null;
+    String(src == null ? '' : src).split(/\r?\n/).forEach(function (line) {
+      line = line.replace(/\s+$/, '');
+      if (line === '') return;
+      var head = line.match(/^\[([^\]]+)\]$/);
+      if (head) {
+        cur = { title: head[1].trim(), rows: [] };
+        groups.push(cur);
+        return;
+      }
+      var m = line.match(/^([^:]{1,60}):\s*(.+)$/);
+      if (m && cur) {
+        cur.rows.push([m[1].trim(), m[2].trim()]);
+      } else if (line.indexOf(':') !== -1) {
+        /* строка до первой группы — в первую же группу */
+        cur = cur || { title: 'Параметры', rows: [] };
+        var parts = line.split(':');
+        cur.rows.push([parts[0].trim(), parts.slice(1).join(':').trim()]);
+        if (groups.indexOf(cur) === -1) groups.push(cur);
+      }
+    });
+    return groups.filter(function (g) { return g.rows.length > 0; });
+  }
+
   function techspecGroups(p) {
+    if (p.techspec) {
+      var parsed = parseTechspec(p.techspec);
+      if (parsed.length) return parsed;
+    }
+    /* Фолбэк, если TV/поле не заполнены */
     var doubleSide = p.category.indexOf('Compact') !== -1;
+    var fmts = formatsList(p).map(function (f) { return FORMATS[f]; });
     return [
       {
         title: 'Основные параметры',
         rows: [
           ['Тип материала', p.category],
           ['Толщина', p.thickness + ' мм'],
-          ['Формат', '3050 × 1320 / 3050 × 1570 мм'],
+          ['Формат', fmts.join(' / ')],
           ['Декоративность', doubleSide ? 'Двухсторонняя' : 'Односторонняя']
         ]
       },
@@ -451,6 +513,7 @@
 
     function applyProduct(p) {
       state.product = p;
+      config.format = formatsList(p)[0];
       renderHero(p);
       initGallery(p);
       renderThicknesses(p);

@@ -59,6 +59,14 @@
     {
       "type": "input",
       "class": "migx-col-1",
+      "name": "thicknesses",
+      "caption": "Все толщины (через |)",
+      "description": "Блок «Другие толщины» на карточке, например: 6|12|16|25 (пусто = только основная)",
+      "options": {}
+    },
+    {
+      "type": "input",
+      "class": "migx-col-1",
       "name": "fire_class",
       "caption": "Пожарный класс",
       "description": "Бейдж на изображении карточки, например: KM1 (пусто = не показывается)",

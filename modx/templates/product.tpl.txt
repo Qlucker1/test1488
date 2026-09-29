@@ -2,14 +2,24 @@
   ШАБЛОН MODX: HPL Product
   Карточка товара HPL.
 
-  Данные товара: snippet snGetHplProduct читает MIGX-грид контейнера
-  (hpl-catalog-container) по alias ресурса и вшивает его в
-  <script type="application/json" id="hpl-product-json"> — его подхватывает product.js.
+  ИСТОЧНИКИ ДАННЫХ (приоритет сверху вниз):
+  1) TV ресурса-товара (вкладка «Свойства» в менеджере) — все характеристики
+     заполняются руками контент-менеджером:
+       hpl_thickness  hpl_thicknesses  hpl_category  hpl_application
+       hpl_decors     hpl_processing   hpl_formats   hpl_techspec
+     Полное описание TV: modx/README.md, раздел «Переменные шаблона (TV)».
+  2) MIGX-грид контейнера hpl-catalog-container (строка с slug = alias) —
+     фолбэк + источник «Другие решения».
+
+  snippet snGetHplProduct (код) объединяет TV + MIGX в один JSON:
+  <script type="application/json" id="hpl-product-json"> — его подхватывает
+  product.js (рендер конфигуратора, «Другие толщины», тех. характеристик).
 
   Ресурсу товара нужно задать:
-    - pagetitle: название товара (дублируется из MIGX-поля title)
-    - alias: ТОТ ЖЕ slug, что и в MIGX-поле «slug»
+    - pagetitle: название товара
+    - alias: ТОТ ЖЕ slug, что и в MIGX-поле «slug» (для связки с каталогом)
     - template: HPL Product
+    - TV: заполнить характеристики (см. выше)
   ========================================================================== -->
 <!DOCTYPE html>
 <html lang="ru">
@@ -17,7 +27,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>[[*pagetitle:default=`HPL панели Lemark`]] — купить HPL от производителя</title>
-  <meta name="description" content="[[*description:default=`HPL-панели Lemark: технические характеристики, декоры, раскрой по чертежам. Производство полного цикла.`*]]">
+  <meta name="description" content="[[*description:default=`[[+hpl_application:default=`HPL-панели Lemark: технические характеристики, декоры, раскрой по чертежам.`]]`*]]">
   <link rel="canonical" href="[[++site_url]][[*alias*]]/">
   <!-- Страховка: если VisueltPro не загрузится, fallback Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -63,9 +73,19 @@
 
           <div class="product-info">
             <h1 class="product-info__title" id="productTitle">[[*pagetitle*]]</h1>
-            <p class="product-info__desc" id="productDesc"></p>
+            <p class="product-info__desc" id="productDesc">[[+hpl_application:*]]</p>
 
-            <dl class="product-specs" id="productSpecs"></dl>
+            <!-- Характеристики: напрямую из TV (видны без JS, для SEO).
+                 product.js при загрузке перерисовывает этот блок из JSON
+                 (тот же источник — TV, см. snGetHplProduct). -->
+            <dl class="product-specs" id="productSpecs">
+              <div class="product-specs__row"><dt>Толщина</dt><dd>[[+hpl_thickness:*]] мм</dd></div>
+              <div class="product-specs__row"><dt>Тип материала</dt><dd>[[+hpl_category:*]]</dd></div>
+              <div class="product-specs__row"><dt>Применение</dt><dd>[[+hpl_application:*]]</dd></div>
+              <div class="product-specs__row"><dt>Декоры</dt><dd>[[+hpl_decors:*]]</dd></div>
+              <div class="product-specs__row"><dt>Обработка</dt><dd>[[+hpl_processing:*]]</dd></div>
+              <div class="product-specs__row"><dt>Формат</dt><dd>[[+hpl_formats:*]]</dd></div>
+            </dl>
 
             <div class="product-price" id="productPriceBox">
               <div class="product-price__value" id="productPriceValue"></div>
@@ -115,8 +135,8 @@
           </div>
         </section>
 
-        <!-- ====== Другие толщины ====== -->
-        <section class="product-thicknesses section-fc">
+        <!-- ====== Другие толщины (варианты из TV hpl_thicknesses) ====== -->
+        <section class="product-thicknesses section-fc" id="thicknessSection">
           <h2 class="section-fc__heading product-thicknesses__title">Другие толщины</h2>
           <div class="section-fc__container">
             <div class="product-thicknesses__chips" id="thicknessChips"></div>
@@ -150,8 +170,9 @@
                 <div class="config-group">
                   <div class="config-group__title"><i>3.</i> Формат листа</div>
                   <div class="config-options" id="configFormat">
-                    <button class="config-option is-selected" type="button" data-value="3050×1320">3050 × 1320 мм</button>
-                    <button class="config-option" type="button" data-value="3050×1570">3050 × 1570 мм</button>
+                    <button class="config-option is-selected" type="button" data-value="3050×1300">3050 × 1300 мм</button>
+                    <button class="config-option" type="button" data-value="3050×1600">3050 × 1600 мм</button>
+                    <button class="config-option" type="button" data-value="3050×1250">3050 × 1250 мм</button>
                   </div>
                 </div>
                 <div class="config-group">

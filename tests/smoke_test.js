@@ -269,23 +269,44 @@ async function testProduct() {
   const facts = byId['factProduction'];
   const thicks = byId['thicknessChips'];
 
+  const p1 = DATA.products.find(p => p.slug === 'hpl-12-peregorodki');
+
   check('заголовок товара', title.textContent === 'HPL панели 12 мм для сантехнических перегородок', title.textContent);
   check('specs: Толщина 12 мм + «Применение» полный текст',
     specs.innerHTML.includes('12 мм') && specs.innerHTML.includes('Сантехнические и душевые перегородки'));
+  check('specs: Декоры/Обработка/Формат из данных (наполняемые)',
+    specs.innerHTML.includes(p1.decors) && specs.innerHTML.includes(p1.processing)
+    && p1.formats.every(f => specs.innerHTML.includes(f.replace('×', ' × ') + ' мм')),
+    specs.innerHTML);
   check('price: от 4 200 ₽/м² (без дубля ₽)',
     price.innerHTML.includes('4 200') && price.innerHTML.includes('/м²') && price.innerHTML.indexOf('₽ ₽') === -1, price.innerHTML);
   check('галерея: изображение продукта', gallery.src === 'assets/img/products/p01.svg', gallery.src);
   check('факт: срок производства', facts.textContent === 'от 10 рабочих дней', facts.textContent);
   check('крошки: MARK + Каталог HPL', byId['breadcrumbs'].innerHTML.includes('Каталог HPL'));
-  check('чипы толщин (без категорий), текущая «— текущая»',
-    ['6', '8', '10', '12', '16', '25'].every(t => thicks.innerHTML.includes(t + ' мм'))
-    && !thicks.innerHTML.includes('Laboratory') && thicks.innerHTML.includes('— текущая'));
+
+  /* Другие толщины — из thicknesses товара (текущая помечена) */
+  const nTh = p1.thicknesses.length;
+  check('«Другие толщины»: варианты из данных, текущая «— текущая»',
+    p1.thicknesses.every(t => thicks.innerHTML.includes(t + ' мм'))
+    && thicks.innerHTML.includes('— текущая')
+    && count(thicks.innerHTML, 'thickness-chip') === nTh,
+    'got ' + count(thicks.innerHTML, 'thickness-chip') + ', want ' + nTh);
+
+  /* Технические характеристики — из techspec (парсер структурного текста) */
+  check('тех. характеристики: группы из techspec (Плотность 1.40 г/см³)',
+    byId['techspecGroups'].innerHTML.includes('Основные параметры')
+    && byId['techspecGroups'].innerHTML.includes('Плотность')
+    && byId['techspecGroups'].innerHTML.includes('1.40 г/см³')
+    && count(byId['techspecGroups'].innerHTML, 'class="techspec-group"') === 3);
 
   check('конфигуратор: 8 свотчей однотонных',
     count(byId['configDecor'].innerHTML, 'config-decor-swatch__code') === 8
     && byId['configDecor'].innerHTML.includes('0101'));
-  check('сводка конфигурации: 0101 + Super Matt',
-    byId['configSummary'].innerHTML.includes('0101') && byId['configSummary'].innerHTML.includes('Super Matt'));
+  check('сводка конфигурации: 0101 + Super Matt + формат из данных',
+    byId['configSummary'].innerHTML.includes('0101')
+    && byId['configSummary'].innerHTML.includes('Super Matt')
+    && byId['configSummary'].innerHTML.includes(p1.formats[0].replace('×', ' × ') + ' мм'),
+    byId['configSummary'].innerHTML);
 
   (byId['configDecorGroups']._listeners['click'] || []).forEach(fn => fn({
     target: { closest: () => ({ dataset: { group: 'wood' } }) }
@@ -319,7 +340,18 @@ async function testProduct() {
   const jsonPayload = {
     applications: { peregorodki: 'Перегородки' },
     products: [{ slug: 'x-1', title: 'MIGX тест', category: 'Compact HPL', applications: ['peregorodki'], thickness: 12, tags: ['12 мм'], properties: ['moisture'], stock: 'in_stock', price: { kind: 'from', label: 'Цена за м²', value: 'от 5 000 ₽' }, image: 'assets/img/products/p02.svg', short_desc: 'desc' }],
-    current: { slug: 'x-1', title: 'MIGX тест', category: 'Compact HPL', applications: ['peregorodki'], thickness: 12, tags: ['12 мм'], properties: ['moisture'], stock: 'in_stock', price: { kind: 'from', label: 'Цена за м²', value: 'от 5 000 ₽' }, image: 'assets/img/products/p02.svg', short_desc: 'desc', production_days: '25', min_order: 'от 20 м²', delivery: 'По РФ' }
+    current: {
+      slug: 'x-1', title: 'MIGX тест', category: 'Композитный HPL 20 мм', applications: ['peregorodki'],
+      thickness: 20, thicknesses: [6, 12, 20, 25],
+      application_text: 'Несущие конструкции и перегородки',
+      decors: 'Металлизированные', processing: 'Раскрой по чертежам',
+      formats: ['3050×1600'],
+      techspec: '[Свои параметры]\nСвоя строка: своё значение\n\n[Вторая группа]\nЕщё: да',
+      tags: ['20 мм'], properties: ['moisture'], stock: 'in_stock',
+      price: { kind: 'from', label: 'Цена за м²', value: 'от 5 000 ₽' },
+      image: 'assets/img/products/p02.svg', short_desc: 'desc',
+      production_days: '25', min_order: 'от 20 м²', delivery: 'По РФ'
+    }
   };
   env4.byId['hpl-product-json'] = new FakeEl('hpl-product-json');
   env4.byId['hpl-product-json'].innerHTML = JSON.stringify(jsonPayload);
@@ -329,4 +361,17 @@ async function testProduct() {
   await wait(30);
   check('MODX JSON: заголовок из вшитых данных', env4.byId['productTitle'].textContent === 'MIGX тест', env4.byId['productTitle'].textContent);
   check('MODX JSON: цена', env4.byId['productPriceValue'].innerHTML.includes('5 000'));
+  check('MODX JSON: specs из TV-полей (свободный тип/применение/декоры)',
+    env4.byId['productSpecs'].innerHTML.includes('Композитный HPL 20 мм')
+    && env4.byId['productSpecs'].innerHTML.includes('Несущие конструкции и перегородки')
+    && env4.byId['productSpecs'].innerHTML.includes('Металлизированные')
+    && env4.byId['productSpecs'].innerHTML.includes('Раскрой по чертежам')
+    && env4.byId['productSpecs'].innerHTML.includes('3050 × 1600 мм'));
+  check('MODX JSON: «Другие толщины» из thicknesses (20 — текущая)',
+    env4.byId['thicknessChips'].innerHTML.includes('20 мм')
+    && env4.byId['thicknessChips'].innerHTML.includes('— текущая')
+    && env4.byId['thicknessChips'].innerHTML.includes('25 мм'));
+  check('MODX JSON: techspec — свои группы',
+    env4.byId['techspecGroups'].innerHTML.includes('Свои параметры')
+    && env4.byId['techspecGroups'].innerHTML.includes('своё значение'));
 }

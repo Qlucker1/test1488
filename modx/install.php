@@ -27,11 +27,16 @@
  *                 popups, hpl-product-card, hpl_products (конфиг MIGX)
  *       - шаблоны: HPL Catalog, HPL Product
  *       - TV:      hpl_products (тип «list» — так MIGX определяет грид)
+ *       - TV:      hpl_thickness, hpl_thicknesses, hpl_category,
+ *                 hpl_application, hpl_decors, hpl_processing,
+ *                 hpl_formats, hpl_techspec — характеристики карточки
+ *                 товара (создаются автоматически; что и как заполнять —
+ *                 modx/README.md, раздел «Переменные шаблона (TV)»)
  *       - snippet: snGetHplProducts, snGetHplProduct
  *       - ресурсы: hpl-catalog-container (MIGX-контейнер, скрытый,
  *                  заполнен тестовыми товарами из sample_data.json),
  *                  katalog-hpl (страница каталога), hpl-12-peregorodki
- *                  (пример карточки товара)
+ *                  (пример карточки товара, TV уже заполнены)
  *
  *  5. УДАЛИТЕ install.php после установки.
  *
@@ -184,6 +189,64 @@ if ($tvObj && !empty($tplIds)) {
 }
 
 // ---------------------------------------------------------------------------
+// 5b. TV карточки товара (HPL Product) — заполняемые характеристики
+//     Описания повторяют modx/README.md. Формат значений:
+//       hpl_thickness   — число: 12
+//       hpl_thicknesses — «6|12|16|25»
+//       hpl_category    — свободный текст: Compact HPL
+//       hpl_application — свободный текст
+//       hpl_decors      — свободный текст
+//       hpl_processing  — свободный текст
+//       hpl_formats     — 1–3 из трёх (ключи совпадают с product.js)
+//       hpl_techspec    — группами: [Название группы] + «Параметр: значение»
+// ---------------------------------------------------------------------------
+$hplProductTv = array(
+    'hpl_thickness'   => array('number', '', 'Основная (текущая) толщина товара, мм. Показывается в строке «Толщина» и помечается «— текущая» в блоке «Другие толщины». Пусто — значение из MIGX-поля «thickness».'),
+    'hpl_thicknesses' => array('text', '', 'Все доступные толщины товара — блок «Другие толщины». Числа через |, например: 6|12|16|25. Если вариантов меньше двух, блок скрывается.'),
+    'hpl_category'    => array('text', '', 'Тип материала — свободный текст для строки «Тип материала» на карточке, например: Compact HPL. Пусто — значение из MIGX-поля «category».'),
+    'hpl_application' => array('text', '', 'Применение — свободный текст для строки «Применение» (и meta description страницы). Пусто — значение из MIGX-поля «application_text».'),
+    'hpl_decors'      => array('text', '', 'Декоры — свободный текст для строки «Декоры», например: «3156 декоров / выбор из каталога». Пусто — «3156 декоров / выбор из каталога».'),
+    'hpl_processing'  => array('text', '', 'Обработка — свободный текст для строки «Обработка», например: «Раскрой и CNC по запросу». Пусто — «Раскрой и CNC по запросу».'),
+    'hpl_formats'     => array('listbox', '', 'Форматы листа — отметьте 1–3 (строка «Формат» на карточке + стартовый вариант в конфигураторе). Список фиксированный: 3050 × 1300 / 1600 / 1250 мм. Пусто — показываются все три.'),
+    'hpl_techspec'    => array('textarea', '', 'Технические характеристики — полностью редактируемые. Формат: название группы в квадратных строках [Основные параметры], затем строки «Параметр: значение». Группы и строки — любые. Пример и правила — в modx/README.md.'),
+);
+
+if (isset($tplIds['HPL Product'])) {
+    $prodTplId = ',' . (int)$tplIds['HPL Product'] . ',';
+
+    foreach ($hplProductTv as $name => $tv) {
+        $existing = $modx->getObject('modTemplateVariable', $name);
+        if ($existing) {
+            note('skip', 'TV «' . $name . '» — уже существует, не трогаем');
+            continue;
+        }
+        $v = $modx->newObject('modTemplateVariable');
+        $v->set('name', $name);
+        $v->set('type', $tv[0]);
+        $v->set('display', $tv[0] === 'number' ? 'number' : ($tv[0] === 'textarea' ? 'textarea' : 'text'));
+        $v->set('description', $tv[2]);
+        $v->set('rank', 100);
+        $v->set('process_type', 0);
+        $v->set('tv_type', 0);
+        $v->set('template_ids', $prodTplId);
+        if ($name === 'hpl_formats') {
+            $v->set('type', 'listbox');
+            $v->set('display', 'listbox');
+            $v->set('multiple', 1);
+            $v->set('options', '3050×1300|3050×1600|3050×1250');
+            $v->set('options_caption', '3050 × 1300 мм|3050 × 1600 мм|3050 × 1250 мм');
+        }
+        if ($v->save()) {
+            note('ok', 'TV «' . $name . '» создана (шаблон HPL Product)');
+        } else {
+            note('err', 'TV «' . $name . '»: ошибка сохранения');
+        }
+    }
+} else {
+    note('err', 'Шаблон «HPL Product» не создан — TV карточки товара не привязаны');
+}
+
+// ---------------------------------------------------------------------------
 // 6. Snippets
 // ---------------------------------------------------------------------------
 $snippets = array(
@@ -263,6 +326,7 @@ if ($container) {
                     'application_text' => isset($p['application_text']) ? $p['application_text'] : '',
                     'fire_class'       => isset($p['fire_class']) ? $p['fire_class'] : '',
                     'thickness'        => (int)$p['thickness'],
+                    'thicknesses'      => isset($p['thicknesses']) ? implode('|', $p['thicknesses']) : '',
                     'properties'       => isset($p['properties']) ? implode('|', $p['properties']) : '',
                     'tags'             => implode('|', $p['tags']),
                     'stock'            => $p['stock'],
@@ -346,6 +410,16 @@ if ($sampleData && !empty($sampleData['products']) && isset($tplIds['HPL Product
         $demo->set('content', '');
         $demo->set('menuindex', 101);
         $demo->set('show_in_menu', 0);
+        /* TV карточки заполняем из sample_data.json — демо-страница
+           сразу показывает, как работают hpl_* (см. README) */
+        $demo->set('hpl_thickness', (int)$first['thickness']);
+        $demo->set('hpl_thicknesses', isset($first['thicknesses']) ? implode('|', $first['thicknesses']) : '');
+        $demo->set('hpl_category', $first['category']);
+        $demo->set('hpl_application', isset($first['application_text']) ? $first['application_text'] : '');
+        $demo->set('hpl_decors', isset($first['decors']) ? $first['decors'] : '');
+        $demo->set('hpl_processing', isset($first['processing']) ? $first['processing'] : '');
+        $demo->set('hpl_formats', isset($first['formats']) ? implode('|', $first['formats']) : '');
+        $demo->set('hpl_techspec', isset($first['techspec']) ? $first['techspec'] : '');
         if ($modx->save($demo)) {
             note('ok', 'Пример карточки товара «' . $first['slug'] . '» создан и опубликован');
         } else {
@@ -384,7 +458,8 @@ foreach ($groups as $key => $label) {
 
 echo '<h2>Дальнейшие шаги</h2><ul>
 <li>Скопируйте файлы в сайт: <code>assets/css/ → /assets/templates/assets/css/</code>, <code>assets/js/ → /assets/templates/assets/js/</code>, <code>assets/img/ → /assets/templates/assets/img/</code>.</li>
-<li>Откройте ресурс <b>hpl-catalog-container</b> в менеджере → вкладка «Свойства» → там MIGX-грид «Каталог HPL»: редактируйте/добавляйте товары.</li>
+<li>Откройте ресурс <b>hpl-catalog-container</b> в менеджере → вкладка «Свойства» → там MIGX-грид «Каталог HPL»: редактируйте/добавляйте товары (карточки каталога).</li>
+<li>Карточка товара: откройте ресурс товара (шаблон <b>HPL Product</b>) → вкладка «Свойства» → заполните TV <b>hpl_*</b> (толщины, тип, применение, декоры, обработка, форматы, тех. характеристики). Что за что отвечает — в <code>modx/README.md</code>, раздел «Переменные шаблона (TV)».</li>
 <li>Проверьте страницу: <a href="' . rtrim($modx->getOption('site_url'), '/') . '/katalog-hpl/" target="_blank">/katalog-hpl/</a> и карточку: <a href="' . rtrim($modx->getOption('site_url'), '/') . '/hpl-12-peregorodki/" target="_blank">/hpl-12-peregorodki/</a>.</li>
 <li>В шапке/подвале (чанки header, footer) при необходимости поправьте алиасы меню под ваш сайт.</li>
 <li><b>Удалите этот файл (install.php) с сервера.</b></li>
