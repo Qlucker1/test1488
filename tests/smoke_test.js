@@ -76,7 +76,34 @@ function makeEnv(extra = {}) {
   return { sandbox, byId, docListeners };
 }
 
-/* Фейковый сайдбар фильтров (статичный HTML в реальном DOM) */
+/* Фейковый верхний ряд плиток «Подберите HPL по применению» */
+function makeApps(byId) {
+  const tiles = {};
+  const make = (app, label, all = false) => {
+    const t = new FakeEl('tile-' + app);
+    t.dataset = { app };
+    t.textContent = label;
+    if (all) t.classList.add('app-tile--all');
+    if (app === 'all') t.classList.add('is-active');
+    tiles[app] = t;
+    return t;
+  };
+  make('faades', 'Фасады');
+  make('peregorodki', 'Перегородки');
+  make('medicina', 'Медицина');
+  make('laboratorii', 'Лаборатории');
+  make('orientka', 'Отделка');
+  make('mebel', 'Мебель');
+  make('transport', 'Транспорт');
+  make('all', 'Все сферы', true);
+
+  const box = new FakeEl('catalogApps');
+  box.querySelectorAll = sel => (sel === '.app-tile' ? Object.values(tiles) : []);
+  byId['catalogApps'] = box;
+  return { box, tiles };
+}
+
+/* Фейковый сайдбар доп. фильтров (статичный HTML в реальном DOM) */
 function makeFilters(byId) {
   const inputs = [];
   const add = (filter, value, label) => {
@@ -89,10 +116,6 @@ function makeFilters(byId) {
     inputs.push(inp);
     return inp;
   };
-  [
-    ['faades', 'Фасады'], ['peregorodki', 'Сантехнические перегородки'], ['laboratorii', 'Чистые помещения'],
-    ['medicina', 'Медицинские учреждения'], ['orientka', 'Интерьерная отделка'], ['mebel', 'Мебель'], ['transport', 'Транспорт']
-  ].forEach(a => add('apps', a[0], a[1]));
   ['Compact HPL', 'Standard HPL', 'Facade HPL', 'Laboratory HPL']
     .forEach(v => add('category', v, v));
   [
@@ -133,6 +156,7 @@ function check(name, cond, extra = '') {
 (async function testCatalog() {
   console.log('catalog.js:');
   const { sandbox, byId, docListeners } = makeEnv();
+  const { box: appsBox, tiles } = makeApps(byId);
   const { box, inputs, buttons } = makeFilters(byId);
   vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets/js/main.js'), 'utf8'), sandbox, { filename: 'main.js' });
@@ -143,71 +167,76 @@ function check(name, cond, extra = '') {
   const grid = byId['catalogGrid'];
   const countEl = byId['catalogCount'];
   const chips = byId['catalogChips'];
-  const loadmore = byId['catalogLoadmore'];
-  const note = byId['catalogLoadmoreNote'];
   const resetBtn = byId['__q_.js-reset'];
   const loadmoreBtn = byId['__q_.js-loadmore'];
   const inp = (g, v) => inputs.find(i => i.dataset.filter === g && i.dataset.value === v);
-  const btn = t => buttons.find(b => b.dataset.value === String(t));
+  const thBtn = t => buttons.find(b => b.dataset.value === String(t));
+  const clickTile = app => (appsBox._listeners['click'] || []).forEach(fn => fn({ target: { closest: () => tiles[app] } }));
   const change = () => (box._listeners['change'] || []).forEach(fn => fn({}));
   const clickTh = b => (box._listeners['click'] || []).forEach(fn => fn({ target: { closest: () => b } }));
   const doReset = () => (resetBtn._listeners['click'] || []).forEach(fn => fn());
   const found = () => (countEl.innerHTML.match(/<b>(\d+)<\/b>/) || [])[1];
 
-  check('сетка: 9 карточек, «Найдено 24 решения»',
-    count(grid.innerHTML, 'class="product-card"') === 9 && found() === '24', 'found=' + found());
+  check('сетка: 9 карточек, «Найдено 24 решения», активна «Все сферы»',
+    count(grid.innerHTML, 'class="product-card"') === 9 && found() === '24'
+    && tiles.all.classList.contains('is-active'), 'found=' + found());
   check('первая карточка: 12 мм перегородки + бейдж KM1',
     grid.innerHTML.includes('HPL панели 12 мм для сантехнических перегородок')
     && grid.innerHTML.includes('product-card__fire-badge'));
-  check('loadmore: «Показано 9 из 24»', note.textContent.includes('9 из 24'), note.textContent);
 
-  /* --- Фильтры --- */
-  inp('apps', 'peregorodki').checked = true; change(); await wait(20);
-  check('фильтр «Сантехнические перегородки» → ' + exp(p => p.applications.includes('peregorodki')) + ' найдено',
-    found() === String(exp(p => p.applications.includes('peregorodki'))), 'found=' + found());
-  check('чип с подписью из сайдбара', chips.innerHTML.includes('Сантехнические перегородки'));
+  /* --- Плитки применения (верхний ряд) --- */
+  clickTile('peregorodki'); await wait(20);
+  const nPereg = exp(p => p.applications.includes('peregorodki'));
+  check('плитка «Перегородки» → ' + nPereg + ' найдено', found() === String(nPereg), 'found=' + found());
+  check('чип «Перегородки», плитка активна',
+    chips.innerHTML.includes('Перегородки') && tiles.peregorodki.classList.contains('is-active')
+    && !tiles.all.classList.contains('is-active'));
 
+  clickTile('medicina'); await wait(20);
+  check('плитка «Медицина» (одна за раз) → ' + exp(p => p.applications.includes('medicina')),
+    found() === String(exp(p => p.applications.includes('medicina'))), 'found=' + found());
+
+  clickTile('all'); await wait(20);
+  check('плитка «Все сферы» → 24', found() === '24' && tiles.all.classList.contains('is-active'));
+
+  /* --- Сайдбар: доп. фильтры --- */
   inp('category', 'Standard HPL').checked = true; change(); await wait(20);
-  check('комбо: перегородки AND Standard HPL',
-    found() === String(exp(p => p.applications.includes('peregorodki') && p.category === 'Standard HPL')), 'found=' + found());
-  doReset(); await wait(20);
-  check('«Сбросить» → 24, чипы пусты', found() === '24' && chips.innerHTML === '', 'found=' + found());
-
-  inp('category', 'Standard HPL').checked = true; change(); await wait(20);
-  check('фильтр «Тип материала: Standard HPL» → ' + exp(p => p.category === 'Standard HPL'),
+  check('тип материала Standard HPL → ' + exp(p => p.category === 'Standard HPL'),
     found() === String(exp(p => p.category === 'Standard HPL')), 'found=' + found());
   doReset(); await wait(20);
+  check('«Сбросить» → 24, чипы пусты, «Все сферы» активна',
+    found() === '24' && chips.innerHTML === '' && tiles.all.classList.contains('is-active'), 'found=' + found());
 
-  clickTh(btn(12)); await wait(20);
-  check('фильтр «Толщина 12 мм» → ' + exp(p => p.thickness === 12),
+  clickTh(thBtn(12)); await wait(20);
+  check('толщина 12 мм → ' + exp(p => p.thickness === 12),
     found() === String(exp(p => p.thickness === 12)), 'found=' + found());
   doReset(); await wait(20);
 
   inp('property', 'fire').checked = true; change(); await wait(20);
-  check('фильтр «Трудногорючий» → ' + exp(p => (p.properties || []).includes('fire')),
+  check('свойство «Трудногорючий» → ' + exp(p => (p.properties || []).includes('fire')),
     found() === String(exp(p => (p.properties || []).includes('fire'))), 'found=' + found());
   doReset(); await wait(20);
 
   inp('stock', 'in_stock').checked = true; change(); await wait(20);
-  check('фильтр «В наличии» → ' + exp(p => p.stock === 'in_stock'),
+  check('наличие «В наличии» → ' + exp(p => p.stock === 'in_stock'),
     found() === String(exp(p => p.stock === 'in_stock')), 'found=' + found());
   doReset(); await wait(20);
 
-  inp('apps', 'peregorodki').checked = true; change();
-  clickTh(btn(12)); await wait(20);
-  check('комбо: перегородки + 12 мм → ' + exp(p => p.applications.includes('peregorodki') && p.thickness === 12),
-    found() === String(exp(p => p.applications.includes('peregorodki') && p.thickness === 12)), 'found=' + found());
-
-  /* снятие фильтра через чип */
-  const removeBtns = (chips.innerHTML.match(/data-remove="[^"]*"/g) || []);
-  check('чипы активны (' + removeBtns.length + ')', removeBtns.length === 2, removeBtns.join(','));
+  /* комбо: плитка + толщина */
+  clickTile('peregorodki'); await wait(5);
+  clickTh(thBtn(12)); await wait(20);
+  const combo = exp(p => p.applications.includes('peregorodki') && p.thickness === 12);
+  check('комбо: Перегородки + 12 мм → ' + combo, found() === String(combo), 'found=' + found());
+  check('чипы активны: сфера + толщина',
+    (chips.innerHTML.match(/data-remove="[^"]*"/g) || []).length === 2);
   doReset(); await wait(20);
-  check('после сброса сетка снова 24', found() === '24');
+  check('после сброса снова 24', found() === '24');
 
   /* load more + сортировка */
   (loadmoreBtn._listeners['click'] || []).forEach(fn => fn({ target: loadmoreBtn, closest: () => loadmoreBtn }));
   await wait(20);
-  check('load more → 18 карточек', count(grid.innerHTML, 'class="product-card"') === 18, 'got ' + count(grid.innerHTML, 'class="product-card"'));
+  check('load more → 18 карточек', count(grid.innerHTML, 'class="product-card"') === 18,
+    'got ' + count(grid.innerHTML, 'class="product-card"'));
 
   const sortSel = byId['catalogSort'];
   sortSel.value = 'name';

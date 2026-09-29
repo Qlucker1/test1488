@@ -103,25 +103,52 @@
           <p class="catalog-intro__desc">Подберите HPL по применению, типу материала, толщине и характеристикам.</p>
         </section>
 
-        <!-- ============ Фильтры (слева) + каталог (справа) ============ -->
+        <!-- Быстрый фильтр по применению (иконки, как в макете) -->
+        <section class="catalog-apps" id="catalogApps" aria-label="Подберите HPL по применению">
+          <span class="catalog-apps__label">Подберите HPL по применению</span>
+          <div class="catalog-apps__grid">
+            <button class="app-tile" type="button" data-app="faades">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 21h18M5 21V5.5L12 3v18M12 21V8l7 2.5V21M8 8h.01M8 11h.01M8 14h.01M8 17h.01M15.5 13h.01M15.5 16h.01"/></svg>
+              <span>Фасады</span>
+            </button>
+            <button class="app-tile" type="button" data-app="peregorodki">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M4 9h16M15 6h.01M8 13v4"/></svg>
+              <span>Перегородки</span>
+            </button>
+            <button class="app-tile" type="button" data-app="medicina">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+              <span>Медицина</span>
+            </button>
+            <button class="app-tile" type="button" data-app="laboratorii">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M9 3h6M10 3v6.3L4.8 18a2 2 0 0 0 1.8 3h10.8a2 2 0 0 0 1.8-3L14 9.3V3M7.5 14h9"/></svg>
+              <span>Лаборатории</span>
+            </button>
+            <button class="app-tile" type="button" data-app="orientka">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 11l9-8 9 8M5.5 9.5V21h13V9.5M10 21v-6h4v6"/></svg>
+              <span>Отделка</span>
+            </button>
+            <button class="app-tile" type="button" data-app="mebel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M6 11V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v6M4 18v-3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3M4 18h16M6 18v2M18 18v2"/></svg>
+              <span>Мебель</span>
+            </button>
+            <button class="app-tile" type="button" data-app="transport">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="4" y="4" width="16" height="13" rx="2"/><path d="M4 10h16M8 21l1-2.5M16 21l-1-2.5M8.5 14h.01M15.5 14h.01"/></svg>
+              <span>Транспорт</span>
+            </button>
+            <button class="app-tile app-tile--all is-active" type="button" data-app="all">
+              <span>Все сферы</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- ============ Фильтры (слева, доп. параметры) + каталог (справа) ============ -->
         <div class="catalog-layout">
 
-          <!-- Сайдбар фильтров -->
+          <!-- Сайдбар доп. фильтров (статичный; JS фильтрует сетку) -->
           <aside class="catalog-filters" id="catalogFilters" aria-label="Фильтры каталога">
             <div class="catalog-filters__head">
               <h2 class="catalog-filters__title">Фильтры</h2>
               <button class="catalog-filters__reset js-reset" type="button">Сбросить</button>
-            </div>
-
-            <div class="catalog-filters__group">
-              <h3 class="catalog-filters__label">Применение</h3>
-              <label class="check"><input type="checkbox" data-filter="apps" value="faades"><span class="check__box"></span>Фасады</label>
-              <label class="check"><input type="checkbox" data-filter="apps" value="peregorodki"><span class="check__box"></span>Сантехнические перегородки</label>
-              <label class="check"><input type="checkbox" data-filter="apps" value="laboratorii"><span class="check__box"></span>Чистые помещения</label>
-              <label class="check"><input type="checkbox" data-filter="apps" value="medicina"><span class="check__box"></span>Медицинские учреждения</label>
-              <label class="check"><input type="checkbox" data-filter="apps" value="orientka"><span class="check__box"></span>Интерьерная отделка</label>
-              <label class="check"><input type="checkbox" data-filter="apps" value="mebel"><span class="check__box"></span>Мебель</label>
-              <label class="check"><input type="checkbox" data-filter="apps" value="transport"><span class="check__box"></span>Транспорт</label>
             </div>
 
             <div class="catalog-filters__group">

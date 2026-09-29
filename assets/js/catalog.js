@@ -1,11 +1,15 @@
 /* ==========================================================================
-   Каталог HPL — фильтры (сайдбар слева), сортировка, "загрузить еще"
-   Тестовый бэкенд: data/products.json (аналог MIGX-грида на MODX,
-   см. modx/README.md и modx/snippets/snGetHplProducts.php)
+   Каталог HPL — фильтры, сортировка, "загрузить еще"
+   - Верхний ряд плиток «Подберите HPL по применению» — быстрый фильтр
+     по сфере (одна за раз, «Все сферы» = без фильтра).
+   - Сайдбар слева — доп. фильтры: тип материала, толщина, специальные
+     свойства, (+ дополнительные параметры: наличие).
+   - Состояние фильтров читается из DOM (единый источник) — одинаково
+     работает и в Netlify-режиме (fetch data/products.json), и в MODX
+     (карточки предрендерены snippet'ом snGetHplProducts).
 
-   Формы данных (обязательные поля товара):
-     slug, title, category, applications[], thickness, tags[],
-     stock, price{kind,label,value}, image, properties[]
+   Обязательные поля товара: slug, title, category, applications[],
+   thickness, tags[], stock, price{kind,label,value}, image, properties[]
    properties: fire | biocidal | chemical | moisture
    ========================================================================== */
 (function () {
@@ -16,10 +20,10 @@
 
   var state = {
     data: null,
-    appLabels: {},    // ключ сферы -> подпись (читаются из сайдбара)
-    propLabels: {},   // ключ свойства -> подпись (читаются из сайдбара)
+    appLabels: {},    // ключ сферы -> подпись (из плиток)
+    propLabels: {},   // ключ свойства -> подпись (из сайдбара)
     products: [],
-    filters: { apps: [], category: [], thickness: [], property: [], stock: [] },
+    filters: { apps: '', category: [], thickness: [], property: [], stock: [] },
     sort: 'recommended',
     visible: PAGE_SIZE
   };
@@ -65,9 +69,7 @@
     return p.href || ('product.html?id=' + encodeURIComponent(p.slug));
   }
 
-  /* ---------- Карточка товара ----------
-     data-* атрибуты используются в MODX-режиме: snippet рендерит карточки
-     на сервере (чанк hpl-product-card), и JS фильтрует уже готовый DOM. */
+  /* ---------- Карточка товара ---------- */
   function cardDataAttrs(p) {
     return ' data-id="' + (p.id || 0) + '"' +
       ' data-slug="' + esc(p.slug) + '"' +
@@ -122,44 +124,62 @@
       '</article>';
   }
 
-  /* ---------- Чтение фильтров из сайдбара (единый источник — DOM) ---------- */
+  /* ---------- Чтение фильтров из DOM (единый источник) ---------- */
   function readFilters() {
-    var f = { apps: [], category: [], thickness: [], property: [], stock: [] };
+    var f = { apps: '', category: [], thickness: [], property: [], stock: [] };
+
+    /* Сфера применения — активная плитка верхнего ряда */
+    els.appTiles.forEach(function (t) {
+      if (t.classList.contains('is-active') && t.dataset.app !== 'all') {
+        f.apps = t.dataset.app;
+      }
+    });
+
+    /* Чекбоксы сайдбара */
     els.filterInputs.forEach(function (inp) {
       if (inp.checked && f[inp.dataset.filter]) {
         f[inp.dataset.filter].push(inp.value);
       }
     });
+
+    /* Толщина — кнопки-переключатели сайдбара */
     els.thicknessButtons.forEach(function (b) {
       if (b.classList.contains('is-active')) {
         f.thickness.push(parseInt(b.dataset.value, 10));
       }
     });
     f.thickness.sort(function (a, b) { return a - b; });
+
     state.filters = f;
   }
 
   function readLabels() {
     state.appLabels = {};
     state.propLabels = {};
-    els.filterInputs.forEach(function (inp) {
-      var label = '';
-      if (inp.parentElement) {
-        label = (inp.parentElement.textContent || '').trim();
+    els.appTiles.forEach(function (t) {
+      if (t.dataset.app && t.dataset.app !== 'all') {
+        var txt = (t.textContent || '').trim();
+        if (txt) state.appLabels[t.dataset.app] = txt;
       }
-      if (inp.dataset.filter === 'apps') state.appLabels[inp.value] = label || inp.value;
-      if (inp.dataset.filter === 'property') state.propLabels[inp.value] = label || inp.value;
+    });
+    els.filterInputs.forEach(function (inp) {
+      if (inp.dataset.filter !== 'property') return;
+      var label = inp.parentElement ? (inp.parentElement.textContent || '').trim() : '';
+      state.propLabels[inp.value] = label || inp.value;
+    });
+  }
+
+  /* Выставить активную сферу в плитках ('' = «Все сферы») */
+  function setActiveApp(key) {
+    els.appTiles.forEach(function (t) {
+      t.classList.toggle('is-active', t.dataset.app === (key || 'all'));
     });
   }
 
   function clearFilterDom() {
     els.filterInputs.forEach(function (inp) { inp.checked = false; });
     els.thicknessButtons.forEach(function (b) { b.classList.remove('is-active'); });
-  }
-
-  function activeFilterCount() {
-    var f = state.filters;
-    return f.apps.length + f.category.length + f.thickness.length + f.property.length + f.stock.length;
+    setActiveApp('');
   }
 
   /* ---------- Фильтрация / сортировка ---------- */
@@ -167,9 +187,9 @@
     var list = state.products.slice();
     var f = state.filters;
 
-    if (f.apps.length) {
+    if (f.apps) {
       list = list.filter(function (p) {
-        return f.apps.some(function (k) { return (p.applications || []).indexOf(k) !== -1; });
+        return (p.applications || []).indexOf(f.apps) !== -1;
       });
     }
     if (f.category.length) {
@@ -218,7 +238,11 @@
   function renderChips() {
     var f = state.filters;
     var html = '';
-    ['apps', 'category', 'thickness', 'property', 'stock'].forEach(function (group) {
+    if (f.apps) {
+      html += '<span class="catalog-chip">' + esc(chipLabel('apps', f.apps)) +
+              '<button type="button" data-remove="apps|' + esc(f.apps) + '" aria-label="Убрать фильтр"></button></span>';
+    }
+    ['category', 'thickness', 'property', 'stock'].forEach(function (group) {
       f[group].forEach(function (value) {
         html += '<span class="catalog-chip">' + esc(chipLabel(group, value)) +
                 '<button type="button" data-remove="' + esc(group + '|' + value) + '" aria-label="Убрать фильтр"></button></span>';
@@ -251,6 +275,7 @@
 
   /* ---------- Запуск ---------- */
   function init() {
+    els.appsBox = document.getElementById('catalogApps');
     els.filtersBox = document.getElementById('catalogFilters');
     els.grid = document.getElementById('catalogGrid');
     els.count = document.getElementById('catalogCount');
@@ -265,7 +290,9 @@
 
     if (!els.grid) return;
 
-    /* Сборка списка фильтров (сайдбар статичный — одинаков в обоих режимах) */
+    els.appTiles = els.appsBox
+      ? Array.prototype.slice.call(els.appsBox.querySelectorAll('.app-tile'))
+      : [];
     els.filterInputs = els.filtersBox
       ? Array.prototype.slice.call(els.filtersBox.querySelectorAll('input[data-filter]'))
       : [];
@@ -274,14 +301,23 @@
       : [];
     readLabels();
 
-    /* Чекбоксы: change на контейнере (делегирование) */
+    /* Плитки применения: одна активная */
+    if (els.appsBox) {
+      els.appsBox.addEventListener('click', function (e) {
+        var tile = e.target.closest ? e.target.closest('.app-tile') : null;
+        if (!tile) return;
+        setActiveApp(tile.dataset.app === 'all' ? '' : tile.dataset.app);
+        state.visible = PAGE_SIZE;
+        render();
+      });
+    }
+
+    /* Чекбоксы + толщина: делегирование на сайдбар */
     if (els.filtersBox) {
       els.filtersBox.addEventListener('change', function () {
         state.visible = PAGE_SIZE;
         render();
       });
-
-      /* Толщина: кнопки-переключатели */
       els.filtersBox.addEventListener('click', function (e) {
         var btn = e.target.closest ? e.target.closest('.thickness-toggle') : null;
         if (!btn) return;
@@ -291,7 +327,7 @@
       });
     }
 
-    /* Сбросить (шапка сайдбара) */
+    /* Сбросить (шапка сайдбара) — очищает и плитки, и доп. фильтры */
     if (els.reset) {
       els.reset.addEventListener('click', function () {
         clearFilterDom();
@@ -318,7 +354,9 @@
       var group = parts[0];
       var value = parts.slice(1).join('|');
 
-      if (group === 'thickness') {
+      if (group === 'apps') {
+        setActiveApp('');
+      } else if (group === 'thickness') {
         els.thicknessButtons.forEach(function (b) {
           if (parseInt(b.dataset.value, 10) === parseInt(value, 10)) b.classList.remove('is-active');
         });

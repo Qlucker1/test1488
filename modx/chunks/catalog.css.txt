@@ -30,11 +30,92 @@
   color: #4b4a48;
 }
 
+/* ---------- Быстрый фильтр по применению (иконки над каталогом) ---------- */
+.catalog-apps {
+  margin-bottom: 3em;
+}
+
+.catalog-apps__label {
+  display: block;
+  font-size: 0.72em;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #838383;
+  margin-bottom: 1.1em;
+}
+
+.catalog-apps__grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 1em;
+}
+
+.app-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9em;
+  padding: 1.5em 0.8em 1.3em;
+  background: #f7f7f7;
+  border: 1px solid #f7f7f7;
+  font-size: 0.8em;
+  font-weight: 500;
+  color: var(--dark);
+  text-align: center;
+  line-height: 1.25em;
+  cursor: pointer;
+  transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+}
+
+.app-tile svg {
+  width: 1.9em;
+  height: 1.9em;
+  color: #4b4a48;
+  transition: color 0.3s;
+}
+
+.app-tile:hover {
+  border-color: rgba(228, 40, 64, 0.45);
+}
+.app-tile:hover svg {
+  color: var(--red);
+}
+
+.app-tile.is-active {
+  background: #ffffff;
+  border-color: var(--red);
+  color: var(--red);
+  font-weight: 700;
+}
+.app-tile.is-active svg {
+  color: var(--red);
+}
+
+/* «Все сферы» — акцентная, как в макете */
+.app-tile--all {
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-color: #f7f7f7;
+  color: var(--dark);
+}
+.app-tile--all:hover {
+  color: var(--red);
+}
+.app-tile--all.is-active {
+  background: #ffffff;
+  border-color: var(--red);
+  color: var(--red);
+}
+
 /* ---------- Макет: фильтры (слева) + каталог (справа) ---------- */
 .catalog-layout {
   display: grid;
-  grid-template-columns: 19em 2.5em 1fr;
-  gap: 0;
+  grid-template-columns: 19em 1fr;
+  gap: 0 2.6em;
   align-items: start;
 }
 
@@ -539,6 +620,9 @@
     padding: 0 0 2em;
     margin-bottom: 2.4em;
   }
+  .catalog-apps__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
   .catalog-intro__heading {
     font-size: 2.2em;
   }
@@ -569,5 +653,11 @@
   }
   .catalog-toolbar {
     gap: 1em;
+  }
+  .catalog-apps__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .app-tile {
+    padding: 1.2em 0.6em 1.1em;
   }
 }
