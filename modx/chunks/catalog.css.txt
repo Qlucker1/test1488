@@ -1,0 +1,444 @@
+/* ==========================================================================
+   ЧАНК MODX: catalog.css — CSS страницы «Каталог HPL».
+   Вставляется в <head> рядом с чанком style.css (см. шаблон HPL Catalog).
+   ========================================================================== */
+
+/* ---------- Верх блока: заголовок страницы ---------- */
+.catalog-intro {
+  padding: 4em 0 2.5em;
+}
+
+.catalog-intro__heading {
+  font-weight: 900;
+  font-size: 3em;
+  line-height: 1em;
+  letter-spacing: -0.01em;
+  max-width: 24em;
+}
+
+.catalog-intro__desc {
+  margin-top: 1.2em;
+  max-width: 30em;
+  font-weight: 300;
+  font-size: 1em;
+  line-height: 1.5em;
+  color: #4b4a48;
+}
+
+/* ---------- Фильтр по применению ---------- */
+.catalog-filter {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 1.6em 0;
+  margin-bottom: 2.2em;
+}
+
+.catalog-filter__label {
+  display: block;
+  font-weight: 500;
+  font-size: 0.8em;
+  line-height: 1.3em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #838383;
+  margin-bottom: 1.2em;
+}
+
+.catalog-filter__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8em;
+}
+
+.catalog-pill {
+  border: 1px solid #d8d8d8;
+  border-radius: 100em;
+  padding: 0.8em 1.9em;
+  font-size: 0.85em;
+  font-weight: 500;
+  color: var(--dark);
+  background: #ffffff;
+  transition: background-color 0.35s, color 0.35s, border-color 0.35s;
+}
+.catalog-pill:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+.catalog-pill.is-active {
+  background: var(--red);
+  border-color: var(--red);
+  color: #ffffff;
+}
+.catalog-pill.is-active:hover {
+  color: #ffffff;
+}
+
+/* ---------- Панель: найдено / чипы / сортировка ---------- */
+.catalog-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1em 2em;
+  margin-bottom: 2.4em;
+}
+
+.catalog-toolbar__count {
+  font-weight: 700;
+  font-size: 1.05em;
+}
+.catalog-toolbar__count b {
+  color: var(--red);
+  font-weight: 900;
+}
+
+.catalog-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6em;
+}
+
+.catalog-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+  background: var(--light);
+  border: 1px solid var(--line);
+  padding: 0.55em 1.2em;
+  font-size: 0.8em;
+  font-weight: 500;
+  color: var(--dark);
+}
+.catalog-chip button {
+  display: inline-flex;
+  width: 0.9em;
+  height: 0.9em;
+  position: relative;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+.catalog-chip button:hover {
+  opacity: 1;
+}
+.catalog-chip button::before,
+.catalog-chip button::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background: var(--red);
+}
+.catalog-chip button::before { transform: rotate(45deg); }
+.catalog-chip button::after { transform: rotate(-45deg); }
+
+.catalog-reset {
+  font-size: 0.8em;
+  font-weight: 500;
+  color: #838383;
+  border-bottom: 1px dashed #838383;
+  padding-bottom: 2px;
+  transition: color 0.3s, border-color 0.3s;
+}
+.catalog-reset:hover {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.catalog-sort {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  font-size: 0.85em;
+  color: #838383;
+}
+.catalog-sort select {
+  font-size: 0.9em;
+  font-weight: 500;
+  color: var(--dark);
+  padding: 0.5em 2.4em 0.5em 0.4em;
+  border: 1px solid var(--line);
+  appearance: none;
+  -webkit-appearance: none;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23222' fill='none' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 0.8em center;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+.catalog-sort select:hover,
+.catalog-sort select:focus {
+  border-color: var(--red);
+}
+
+/* ---------- Сетка карточек ---------- */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2em;
+}
+
+/* ---------- Карточка товара ---------- */
+.product-card {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  transition: border-color 0.4s, box-shadow 0.4s, transform 0.4s;
+}
+.product-card:hover {
+  border-color: rgba(228, 40, 64, 0.4);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.07);
+}
+
+.product-card__picture {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: var(--light);
+}
+.product-card__picture img {
+  transition: transform 0.8s;
+}
+.product-card:hover .product-card__picture img {
+  transform: scale(1.05);
+}
+
+.product-card__badge {
+  position: absolute;
+  top: 1em;
+  left: 1em;
+  z-index: 2;
+  font-size: 0.68em;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.6em 1.1em;
+  background: rgba(34, 34, 34, 0.92);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+}
+.product-card__badge::before {
+  content: "";
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 50%;
+  background: #43d17a;
+}
+.product-card__badge--order::before {
+  background: var(--red);
+}
+.product-card__badge--request::before {
+  background: #f5c518;
+}
+
+.product-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1.4em 1.5em 1.5em;
+  flex: 1;
+}
+
+.product-card__category {
+  font-size: 0.7em;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gray);
+}
+
+.product-card__title {
+  font-size: 1.12em;
+  font-weight: 700;
+  line-height: 1.25em;
+  min-height: 2.5em;
+}
+.product-card__title a {
+  transition: color 0.3s;
+}
+.product-card__title a:hover {
+  color: var(--red);
+}
+
+.product-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+}
+.product-card__tag {
+  background: var(--light);
+  border: 1px solid #ececec;
+  padding: 0.45em 0.9em;
+  font-size: 0.72em;
+  font-weight: 400;
+  color: #4b4a48;
+}
+
+.product-card__footer {
+  margin-top: auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1em;
+  padding-top: 1em;
+  border-top: 1px solid var(--line);
+}
+
+.product-card__price-label {
+  display: block;
+  font-size: 0.7em;
+  font-weight: 400;
+  color: var(--gray);
+  margin-bottom: 0.35em;
+}
+.product-card__price-value {
+  font-size: 1.15em;
+  font-weight: 900;
+  color: var(--dark);
+  white-space: nowrap;
+}
+
+/* ---------- Пустое состояние ---------- */
+.catalog-empty {
+  padding: 5em 0;
+  text-align: center;
+  color: var(--gray);
+  font-weight: 300;
+  font-size: 1em;
+}
+.catalog-empty b {
+  display: block;
+  font-size: 1.6em;
+  font-weight: 900;
+  color: var(--dark);
+  margin-bottom: 0.8em;
+}
+
+/* ---------- Загрузить еще ---------- */
+.catalog-loadmore {
+  display: flex;
+  justify-content: center;
+  margin-top: 3em;
+}
+.catalog-loadmore .border-red-button {
+  min-width: 22em;
+  text-align: center;
+}
+.catalog-loadmore__note {
+  margin-top: 1em;
+  text-align: center;
+  font-size: 0.75em;
+  color: var(--gray);
+}
+
+/* ---------- CTA: помощь с подбором ---------- */
+.catalog-cta {
+  margin: 6em 0;
+  background: var(--dark);
+  color: #ffffff;
+  padding: 4.5em 0;
+  display: grid;
+  grid-template-columns: var(--gaps) 1fr var(--gaps);
+}
+.catalog-cta__inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 3em;
+  align-items: center;
+}
+.catalog-cta__heading {
+  font-weight: 900;
+  font-size: 2.2em;
+  line-height: 1.1em;
+  margin-bottom: 1em;
+  max-width: 22em;
+}
+.catalog-cta__desc {
+  font-weight: 300;
+  font-size: 0.95em;
+  line-height: 1.55em;
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 34em;
+}
+.catalog-cta__buttons {
+  display: grid;
+  gap: 1em;
+}
+.catalog-cta .border-red-button {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+}
+.catalog-cta .border-red-button:hover {
+  background: var(--red);
+  border-color: var(--red);
+}
+.catalog-cta .common-button {
+  white-space: nowrap;
+}
+
+/* ---------- SEO-блок ---------- */
+.catalog-seo {
+  margin-bottom: 6em;
+}
+.catalog-seo__heading {
+  font-weight: 900;
+  font-size: 2em;
+  line-height: 1.1em;
+  margin-bottom: 1.4em;
+}
+.catalog-seo p {
+  font-weight: 400;
+  font-size: 0.95em;
+  line-height: 1.6em;
+  color: #353839;
+  max-width: 75ch;
+  margin-bottom: 1.2em;
+}
+
+/* ---------- Медиа-запросы ---------- */
+@media (max-width: 1500px) {
+  .catalog-grid {
+    gap: 1.6em;
+  }
+}
+
+@media (max-width: 1100px) {
+  .catalog-intro {
+    padding: 2.5em 0 1.8em;
+  }
+  .catalog-intro__heading {
+    font-size: 2.2em;
+  }
+  .catalog-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .catalog-sort {
+    margin-left: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .catalog-cta {
+    grid-template-columns: 1.2em 1fr 1.2em;
+    padding: 3em 0;
+  }
+  .catalog-cta__inner {
+    grid-template-columns: 1fr;
+    gap: 2em;
+  }
+  .catalog-cta__heading {
+    font-size: 1.8em;
+  }
+}
+
+@media (max-width: 768px) {
+  .catalog-grid {
+    grid-template-columns: 1fr;
+  }
+  .catalog-toolbar {
+    gap: 1em;
+  }
+}

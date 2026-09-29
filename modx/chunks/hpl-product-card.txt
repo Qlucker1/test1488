@@ -1,0 +1,41 @@
+<!-- ==========================================================================
+  ЧАНК MODX: hpl-product-card
+  Карточка товара каталога. Рендерится snippet'ом snGetHplProducts
+  (переменные подставляются из MIGX-строки). НЕ вызывается напрямую.
+  ========================================================================== -->
+<article class="product-card"
+  data-id="[[+id*]]"
+  data-slug="[[+slug*]]"
+  data-href="[[+url*]]"
+  data-title="[[+title*]]"
+  data-category="[[+category*]]"
+  data-thickness="[[+thickness*]]"
+  data-apps="[[+apps*]]"
+  data-tags="[[+tags*]]"
+  data-image="[[+image*]]"
+  data-stock="[[+stock*]]"
+  data-price-kind="[[+price_kind*]]"
+  data-price-label="[[+price_label*]]"
+  data-price-value="[[+price_value*]]">
+  <a class="product-card__picture" href="[[+url*]]">
+    [[+badge*]]
+    <img src="[[+image*]]" alt="[[+title*]]" loading="lazy">
+  </a>
+  <div class="product-card__body">
+    <span class="product-card__category">[[+category*]]</span>
+    <h3 class="product-card__title">
+      <a href="[[+url*]]">[[+title*]]</a>
+    </h3>
+    <div class="product-card__tags">[[+tags*]]</div>
+    <div class="product-card__footer">
+      <div>
+        <span class="product-card__price-label">[[+price_label*]]</span>
+        <span class="product-card__price-value">[[+price_value*]]</span>
+      </div>
+      <a class="arrow-button" href="[[+url*]]">
+        <span>Подробнее</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M7 17L17 7M9 7h8v8"/></svg>
+      </a>
+    </div>
+  </div>
+</article>

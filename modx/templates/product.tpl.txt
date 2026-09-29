@@ -1,0 +1,444 @@
+<!-- ==========================================================================
+  ШАБЛОН MODX: HPL Product
+  Карточка товара HPL.
+
+  Данные товара: snippet snGetHplProduct читает MIGX-грид контейнера
+  (hpl-catalog-container) по alias ресурса и вшивает его в
+  <script type="application/json" id="hpl-product-json"> — его подхватывает product.js.
+
+  Ресурсу товара нужно задать:
+    - pagetitle: название товара (дублируется из MIGX-поля title)
+    - alias: ТОТ ЖЕ slug, что и в MIGX-поле «slug»
+    - template: HPL Product
+  ========================================================================== -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[[*pagetitle:default=`HPL панели Lemark`]] — купить HPL от производителя</title>
+  <meta name="description" content="[[*description:default=`HPL-панели Lemark: технические характеристики, декоры, раскрой по чертежам. Производство полного цикла.`*]]">
+  <link rel="canonical" href="[[++site_url]][[*alias*]]/">
+
+  <!-- Базовые стили раздела: чанк style.css -->
+  <style>
+  [[*style.css*]]
+  </style>
+
+  <!-- CSS текущей страницы: отдельный чанк product.css рядом со style.css -->
+  <style>
+  [[*product.css*]]
+  </style>
+</head>
+<body>
+
+  [[*header*]]
+
+  <main class="main-content">
+    <div class="header-placeholder"></div>
+
+    <div class="section-fc" style="grid-template-columns: var(--gaps) 1fr var(--gaps);">
+      <div class="section-fc__container" style="width:100%;">
+
+        <!-- Хлебные крошки -->
+        <nav class="breadcrumbs" id="breadcrumbs" aria-label="Хлебные крошки"></nav>
+
+        <!-- ====== Верх карточки ====== -->
+        <section class="product-hero" id="productHero">
+          <div class="product-gallery">
+            <div class="product-gallery__tabs" id="galleryTabs" role="tablist">
+              <button class="product-gallery__tab is-active" type="button" data-gallery="material">Материал</button>
+              <button class="product-gallery__tab" type="button" data-gallery="texture">Фактура</button>
+              <button class="product-gallery__tab" type="button" data-gallery="interior">В интерьере</button>
+            </div>
+            <div class="product-gallery__stage">
+              <img id="galleryImage" src="" alt="">
+              <span class="product-gallery__caption" id="galleryCaption"></span>
+            </div>
+          </div>
+
+          <div class="product-info">
+            <h1 class="product-info__title" id="productTitle">[[*pagetitle*]]</h1>
+            <p class="product-info__desc" id="productDesc"></p>
+
+            <dl class="product-specs" id="productSpecs"></dl>
+
+            <div class="product-price" id="productPriceBox">
+              <div class="product-price__value" id="productPriceValue"></div>
+              <p class="product-price__note">Точная стоимость зависит от декора, объёма заказа, формата и обработки.</p>
+            </div>
+
+            <div class="product-info__buttons">
+              <button class="common-button common-button_red js-open-price" type="button">Получить точную цену</button>
+              <button class="border-red-button js-open-samples" type="button">Заказать образцы</button>
+              <a class="link-button js-download-doc" href="#" download>Скачать документацию</a>
+            </div>
+
+            <div class="product-facts">
+              <div class="product-facts__item">
+                <b>Срок производства</b>
+                <span id="factProduction"></span>
+              </div>
+              <div class="product-facts__item">
+                <b>Минимальный заказ</b>
+                <span id="factMinOrder"></span>
+              </div>
+              <div class="product-facts__item">
+                <b>Доставка</b>
+                <span id="factDelivery"></span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== Полоса преимуществ ====== -->
+        <section class="product-features-strip" aria-label="Преимущества">
+          <div class="product-features-strip__item">
+            <b>Собственное производство полного цикла</b>
+            <span>от прессования до раскроя на ЧПУ</span>
+          </div>
+          <div class="product-features-strip__item">
+            <b>500 000 м² мощность в месяц</b>
+            <span>рекордные сроки выполнения заказов</span>
+          </div>
+          <div class="product-features-strip__item">
+            <b>Сертифицированная продукция ГОСТ</b>
+            <span>документы для всех регионов и стран СНГ</span>
+          </div>
+          <div class="product-features-strip__item">
+            <b>Локализация — Московская область</b>
+            <span>г. Солнечногорск, доставка по России</span>
+          </div>
+        </section>
+
+        <!-- ====== Другие толщины ====== -->
+        <section class="product-thicknesses section-fc">
+          <h2 class="section-fc__heading product-thicknesses__title">Другие толщины</h2>
+          <div class="section-fc__container">
+            <div class="product-thicknesses__chips" id="thicknessChips"></div>
+          </div>
+        </section>
+
+        <!-- ====== Конфигуратор ====== -->
+        <section class="product-configurator">
+          <div class="section-fc" style="grid-template-columns: var(--gaps) 1fr var(--gaps); margin-bottom:0;">
+            <div class="section-fc__container" style="width:100%;">
+              <h2 class="heading-40">Подберите исполнение</h2>
+              <div class="product-configurator__inner" style="margin-top:2em;">
+                <div class="config-group">
+                  <div class="config-group__title"><i>1.</i> Декор</div>
+                  <div class="config-decor-swatches" id="configDecor"></div>
+                </div>
+                <div class="config-group">
+                  <div class="config-group__title"><i>2.</i> Тиснение</div>
+                  <div class="config-options" id="configEmboss">
+                    <button class="config-option is-selected" type="button" data-value="MT">Super Matt (MT)</button>
+                    <button class="config-option" type="button" data-value="FG">Fine Grain (FG)</button>
+                    <button class="config-option" type="button" data-value="GL">Gloss (GL)</button>
+                  </div>
+                </div>
+                <div class="config-group">
+                  <div class="config-group__title"><i>3.</i> Формат листа</div>
+                  <div class="config-options" id="configFormat">
+                    <button class="config-option is-selected" type="button" data-value="3050×1320">3050 × 1320 мм</button>
+                    <button class="config-option" type="button" data-value="3050×1570">3050 × 1570 мм</button>
+                  </div>
+                </div>
+                <div class="config-group">
+                  <div class="config-group__title"><i>4.</i> Обработка</div>
+                  <div class="config-options" id="configProcessing">
+                    <button class="config-option is-selected" type="button" data-value="none">Без обработки</button>
+                    <button class="config-option" type="button" data-value="cut">Раскрой</button>
+                    <button class="config-option" type="button" data-value="cnc">CNC обработка</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="product-configurator__summary">
+                <p class="product-configurator__summary-text" id="configSummary"></p>
+                <div class="product-configurator__buttons">
+                  <button class="common-button common-button_red js-open-calc" type="button">Получить расчёт выбранной конфигурации</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== Техническое сопровождение ====== -->
+        <section class="product-support">
+          <div id="supportText">
+            <b>Техническое сопровождение</b>
+            <p>Для конструкционных решений мы предоставляем схемы креплений и рекомендации по обработке кромки. Для каждого проекта выделен технический специалист: от подбора декора до монтажа.</p>
+          </div>
+          <a class="arrow-button js-open-calc" href="#" id="supportLink">
+            <span>Все технические файлы</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M7 17L17 7M9 7h8v8"/></svg>
+          </a>
+        </section>
+
+        <!-- ====== Выберите декор ====== -->
+        <section class="product-decors section-fc">
+          <h2 class="section-fc__heading heading">Выберите декор</h2>
+          <div class="section-fc__container">
+            <p class="product-decors__intro">Более 250 вариантов исполнения: от классических монохромных цветов до реалистичных имитаций дерева и натурального камня.</p>
+            <div class="decor-tabs" id="decorTabs">
+              <button class="decor-tab is-active" type="button" data-decor="solid">Однотонные</button>
+              <button class="decor-tab" type="button" data-decor="wood">Древесные</button>
+              <button class="decor-tab" type="button" data-decor="stone">Каменные</button>
+              <button class="decor-tab" type="button" data-decor="fantasy">Фантазийные</button>
+            </div>
+            <div class="decor-grid" id="decorGrid"></div>
+            <div class="product-decors__more">
+              <a class="border-red-button" href="[[++site_url]]katalog-dekorov-hpl/">Смотреть все декоры</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== Технические характеристики ====== -->
+        <section class="product-techspecs section-fc">
+          <h2 class="section-fc__heading heading">Технические характеристики</h2>
+          <div class="section-fc__container">
+            <div class="techspec-groups" id="techspecGroups"></div>
+            <div class="product-techspecs__download">
+              <a class="common-button js-download-doc" href="#" download>Скачать полное техническое описание (PDF)</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== Почему подходит ====== -->
+        <section class="product-why section-fc">
+          <h2 class="section-fc__heading heading" id="whyHeading">Почему это решение подходит</h2>
+          <div class="section-fc__container">
+            <div class="product-why__grid" id="whyGrid"></div>
+          </div>
+        </section>
+
+        <!-- ====== Где применяется ====== -->
+        <section class="product-applying section-fc">
+          <h2 class="section-fc__heading heading">Где применяется</h2>
+          <div class="section-fc__container">
+            <div class="product-applying__grid" id="applyingGrid"></div>
+          </div>
+        </section>
+
+        <!-- ====== Документы и сертификаты ====== -->
+        <section class="product-docs section-fc">
+          <h2 class="section-fc__heading heading">Документы и сертификаты</h2>
+          <div class="section-fc__container">
+            <div class="docs-grid">
+              <div class="doc-card">
+                <span class="doc-card__type">PDF</span>
+                <b>Техническое описание HPL Lemark</b>
+                <span>Обновлено: сентябрь 2026</span>
+                <a class="js-download-doc" href="#" download>Скачать</a>
+              </div>
+              <div class="doc-card">
+                <span class="doc-card__type">PDF</span>
+                <b>Сертификат соответствия</b>
+                <span>ГОСТ-Р</span>
+                <a class="js-download-doc" href="#" download>Скачать</a>
+              </div>
+              <div class="doc-card">
+                <span class="doc-card__type">PDF</span>
+                <b>Пожарный сертификат</b>
+                <span>если применимо</span>
+                <a class="js-download-doc" href="#" download>Скачать</a>
+              </div>
+              <div class="doc-card">
+                <span class="doc-card__type">PDF</span>
+                <b>Рекомендации по обработке</b>
+                <span>Инструкция</span>
+                <a class="js-download-doc" href="#" download>Скачать</a>
+              </div>
+              <div class="doc-card">
+                <span class="doc-card__type">PDF</span>
+                <b>Рекомендации по монтажу</b>
+                <span>Инструкция</span>
+                <a class="js-download-doc" href="#" download>Скачать</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== Изготовим под ваш проект ====== -->
+        <section class="product-stages section-fc">
+          <h2 class="section-fc__heading heading">Изготовим под ваш проект</h2>
+          <div class="section-fc__container">
+            <p class="product-stages__intro">Мы осуществляем полный цикл производства: от прессования панелей до высокоточного раскроя по чертежам заказчика. Поставляем готовые к монтажу комплекты.</p>
+            <div class="stages-list">
+              <div class="stage-item">
+                <b>Получаем спецификацию</b>
+                <p>Присылаете размеры или чертежи проекта</p>
+              </div>
+              <div class="stage-item">
+                <b>Подбираем материал</b>
+                <p>Декор, тиснение и формат под задачи</p>
+              </div>
+              <div class="stage-item">
+                <b>Рассчитываем заказ</b>
+                <p>Фиксируем стоимость и сроки поставки</p>
+              </div>
+              <div class="stage-item">
+                <b>Производим и обрабатываем</b>
+                <p>Раскрой на ЧПУ и упаковка</p>
+              </div>
+              <div class="stage-item">
+                <b>Отгружаем</b>
+                <p>Доставка по Москве и всей России</p>
+              </div>
+            </div>
+            <div class="product-stages__button">
+              <button class="common-button js-open-calc" type="button">Отправить спецификацию на расчёт</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== Проекты ====== -->
+        <section class="product-projects section-fc">
+          <h2 class="section-fc__heading heading">Lemark в реализованных проектах</h2>
+          <div class="section-fc__container">
+            <div class="projects-grid" id="projectsGrid"></div>
+          </div>
+        </section>
+
+        <!-- ====== Другие решения ====== -->
+        <section class="product-related section-fc">
+          <h2 class="section-fc__heading heading">Другие решения HPL</h2>
+          <div class="section-fc__container">
+            <div class="related-grid" id="relatedGrid"></div>
+          </div>
+        </section>
+
+        <!-- ====== FAQ ====== -->
+        <section class="product-faq section-fc">
+          <h2 class="section-fc__heading heading">Частые вопросы</h2>
+          <div class="section-fc__container">
+            <div class="faq-list" id="faqList"></div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ====== Финальный CTA: расчёт ====== -->
+    <section class="product-calc">
+      <div class="section-fc" style="grid-template-columns: var(--gaps) 1fr var(--gaps); margin-bottom:0;">
+        <div class="section-fc__container" style="width:100%;">
+          <div class="product-calc__grid">
+            <div>
+              <h2 class="product-calc__heading" id="calcHeading">Рассчитаем HPL для вашего проекта</h2>
+              <p class="product-calc__desc">Пришлите размеры, спецификацию или описание задачи. Подберём материал, декор и подходящее исполнение и подготовим расчёт.</p>
+              <div class="product-calc__contacts">
+                <span>Телефон</span>
+                <a href="tel:+74952216336">+7 (495) 221-63-36</a>
+                <span>E-mail</span>
+                <a href="mailto:sales@lemarkllc.ru">sales@lemarkllc.ru</a>
+              </div>
+            </div>
+            <form class="product-calc__form js-demo-form" data-form-name="calc">
+              <input class="common-form__input" type="text" name="name" placeholder="Имя" required>
+              <input class="common-form__input" type="text" name="company" placeholder="Компания">
+              <input class="common-form__input" type="tel" name="phone" placeholder="Телефон" required>
+              <input class="common-form__input" type="email" name="email" placeholder="E-mail">
+              <textarea class="common-form__input calc-field--full" name="comment" placeholder="Комментарий"></textarea>
+              <label class="common-form__file-field js-file-field calc-field--full">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-width="2"/></svg>
+                <span class="js-file-label">Прикрепить спецификацию (PDF, DWG, XLSX)</span>
+                <input class="common-form__real-file-input" type="file" name="file">
+              </label>
+              <label class="common-form__terms calc-field--full">
+                <input type="checkbox" name="agree" required>
+                Я даю согласие на обработку персональных данных и принимаю
+                <a href="[[++site_url]]politika-konfidenczialnosti/" target="_blank" rel="noopener">политику конфиденциальности</a>
+              </label>
+              <div class="product-calc__buttons">
+                <button class="common-button common-button_red" type="submit">Получить расчёт</button>
+                <button class="border-red-button" type="button" style="color:#fff;border-color:rgba(255,255,255,.6);" data-open-samples>Заказать образцы</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  [[*footer*]]
+
+  [[*popups*]]
+
+  <!-- Pop-ап: точная цена -->
+  <div class="popup" id="pricePopup" role="dialog" aria-modal="true" aria-label="Получить точную цену">
+    <div class="common-form">
+      <button class="common-form__close-button js-popup-close" type="button" aria-label="Закрыть"></button>
+      <h3 class="common-form__title">Получить <span>точную цену</span></h3>
+      <p class="common-form__desc">Укажите декор и объём — пришлём актуальную стоимость с учётом формата и обработки.</p>
+      <form class="js-demo-form" data-form-name="price">
+        <input class="common-form__input" type="text" name="name" placeholder="Ваше имя" required>
+        <input class="common-form__input" type="tel" name="phone" placeholder="Телефон" required>
+        <input class="common-form__input" type="text" name="decor" placeholder="Декор (артикул), если известен">
+        <label class="common-form__terms">
+          <input type="checkbox" name="agree" required>
+          Я даю согласие на обработку персональных данных и принимаю
+          <a href="[[++site_url]]politika-konfidenczialnosti/" target="_blank" rel="noopener">политику конфиденциальности</a>
+        </label>
+        <button class="common-button common-button_red common-form__submit-button" type="submit">Получить цену</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Pop-ап: образцы -->
+  <div class="popup" id="samplesPopup" role="dialog" aria-modal="true" aria-label="Заказать образцы">
+    <div class="common-form">
+      <button class="common-form__close-button js-popup-close" type="button" aria-label="Закрыть"></button>
+      <h3 class="common-form__title">Заказать <span>образцы</span></h3>
+      <p class="common-form__desc">Отправим физические образцы HPL и каталог декоров на ваш адрес или в офис.</p>
+      <form class="js-demo-form" data-form-name="samples">
+        <input class="common-form__input" type="text" name="name" placeholder="Ваше имя" required>
+        <input class="common-form__input" type="tel" name="phone" placeholder="Телефон" required>
+        <input class="common-form__input" type="text" name="address" placeholder="Адрес для отправки образцов">
+        <label class="common-form__terms">
+          <input type="checkbox" name="agree" required>
+          Я даю согласие на обработку персональных данных и принимаю
+          <a href="[[++site_url]]politika-konfidenczialnosti/" target="_blank" rel="noopener">политику конфиденциальности</a>
+        </label>
+        <button class="common-button common-button_red common-form__submit-button" type="submit">Заказать образцы</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Pop-ап: расчёт конфигурации -->
+  <div class="popup" id="calcPopup" role="dialog" aria-modal="true" aria-label="Получить расчёт">
+    <div class="common-form">
+      <button class="common-form__close-button js-popup-close" type="button" aria-label="Закрыть"></button>
+      <h3 class="common-form__title">Получить <span>расчёт</span></h3>
+      <p class="common-form__desc" id="calcPopupConfig">Укажите контакты — пришлём расчёт выбранной конфигурации в течение рабочего дня.</p>
+      <form class="js-demo-form" data-form-name="calc-popup">
+        <input class="common-form__input" type="text" name="name" placeholder="Ваше имя" required>
+        <input class="common-form__input" type="tel" name="phone" placeholder="Телефон" required>
+        <input class="common-form__input" type="email" name="email" placeholder="E-mail">
+        <label class="common-form__file-field js-file-field">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-width="2"/></svg>
+          <span class="js-file-label">Прикрепить спецификацию (PDF, DWG, XLSX)</span>
+          <input class="common-form__real-file-input" type="file" name="file">
+        </label>
+        <label class="common-form__terms">
+          <input type="checkbox" name="agree" required>
+          Я даю согласие на обработку персональных данных и принимаю
+          <a href="[[++site_url]]politika-konfidenczialnosti/" target="_blank" rel="noopener">политику конфиденциальности</a>
+        </label>
+        <button class="common-button common-button_red common-form__submit-button" type="submit">Получить расчёт</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Данные товара из MIGX (вешает snippet) -->
+  [[+snGetHplProduct?&container=`hpl-catalog-container`&id=`[[*alias*]]`*]]
+
+  <!-- JS: базовый + JS карточки товара -->
+  <script src="[[++site_url]]assets/templates/assets/js/main.js?v=[[++core_version]]"></script>
+  <script src="[[++site_url]]assets/templates/assets/js/product.js?v=[[++core_version]]"></script>
+</body>
+</html>

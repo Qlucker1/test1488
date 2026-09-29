@@ -1,0 +1,140 @@
+<!-- ==========================================================================
+  ШАБЛОН MODX: HPL Catalog
+  Страница «Каталог HPL-панелей Lemark».
+
+  Схема <head> (как просили — отдельный чанк CSS рядом со style.css):
+    <style>[[*style.css*]]</style>    <- базовые стили раздела (чанк)
+    <style>[[*catalog.css*]]</style>  <- CSS ТОЛЬКО этой страницы (чанк)
+
+  Товары подтягиваются из MIGX-грида snippet'ом snGetHplProducts
+  (контейнер — ресурс с алиасом hpl-catalog-container, TV hpl_products).
+
+  Ресурсу нужно задать:
+    - pagetitle: «Каталог HPL-панелей Lemark»
+    - description: SEO-описание
+    - content: SEO-текст страницы (заголовок «Каталог HPL Lemark» + абзацы)
+    - alias: katalog-hpl
+  ========================================================================== -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[[*pagetitle:default=`Каталог HPL-панелей Lemark`]] — производитель HPL-пластика</title>
+  <meta name="description" content="[[*description:default=`Каталог HPL-панелей Lemark: подберите HPL по применению, типу материала, толщине и характеристикам. Более 3156 декоров.`*]]">
+  <link rel="canonical" href="[[++site_url]][[*alias:default=`katalog-hpl`*]]/">
+
+  <!-- Базовые стили раздела: чанк style.css -->
+  <style>
+  [[*style.css*]]
+  </style>
+
+  <!-- CSS текущей страницы: отдельный чанк catalog.css рядом со style.css.
+       Для новых страниц — свой чанк (product.css, ...insert-здесь-имя). -->
+  <style>
+  [[*catalog.css*]]
+  </style>
+</head>
+<body>
+
+  [[*header*]]
+
+  <main class="main-content">
+    <div class="header-placeholder"></div>
+
+    <div class="section-fc" style="grid-template-columns: var(--gaps) 1fr var(--gaps);">
+      <div class="section-fc__container" style="width:100%;">
+
+        <!-- Заголовок страницы -->
+        <section class="catalog-intro">
+          <h1 class="catalog-intro__heading">[[*pagetitle*]]</h1>
+          <p class="catalog-intro__desc">Подберите HPL по применению, типу материала, толщине и характеристикам.</p>
+        </section>
+
+        <!-- Фильтр по применению (JS также работает в режиме предрендеренных карточек) -->
+        <section class="catalog-filter" aria-label="Фильтр по применению">
+          <span class="catalog-filter__label">Подберите HPL по применению</span>
+          <div class="catalog-filter__pills" id="catalogPills">
+            <button class="catalog-pill is-active" type="button" data-app="all">Все сферы</button>
+            <button class="catalog-pill" type="button" data-app="faades">Фасады</button>
+            <button class="catalog-pill" type="button" data-app="peregorodki">Перегородки</button>
+            <button class="catalog-pill" type="button" data-app="medicina">Медицина</button>
+            <button class="catalog-pill" type="button" data-app="laboratorii">Лаборатории</button>
+            <button class="catalog-pill" type="button" data-app="orientka">Отделка</button>
+            <button class="catalog-pill" type="button" data-app="mebel">Мебель</button>
+            <button class="catalog-pill" type="button" data-app="transport">Транспорт</button>
+          </div>
+        </section>
+
+        <!-- Панель результатов -->
+        <div class="catalog-toolbar">
+          <span class="catalog-toolbar__count" id="catalogCount">Найдено <b>…</b> решений</span>
+          <div class="catalog-chips" id="catalogChips"></div>
+          <button class="catalog-reset js-reset" type="button" hidden>Сбросить все</button>
+          <div class="catalog-sort">
+            <span>Сортировка:</span>
+            <select id="catalogSort" aria-label="Сортировка">
+              <option value="recommended">Сначала рекомендуемые</option>
+              <option value="thickness_asc">По толщине (сначала тонкие)</option>
+              <option value="thickness_desc">По толщине (сначала толстые)</option>
+              <option value="name">По названию</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Сетка карточек: MIGX-грид (контейнер hpl-catalog-container) -->
+        <section class="catalog-grid" id="catalogGrid" aria-label="Список товаров">
+          [[+snGetHplProducts?&container=`hpl-catalog-container`*]]
+        </section>
+
+        <!-- Пусто -->
+        <div class="catalog-empty" id="catalogEmpty" hidden>
+          <b>Ничего не найдено</b>
+          Попробуйте выбрать другую сферу применения или сбросьте фильтры.
+        </div>
+
+        <!-- Загрузить еще -->
+        <div class="catalog-loadmore" id="catalogLoadmore" hidden>
+          <div>
+            <button class="border-red-button js-loadmore" type="button">Загрузить еще</button>
+            <div class="catalog-loadmore__note" id="catalogLoadmoreNote"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CTA: помощь с подбором -->
+    <section class="catalog-cta">
+      <div class="catalog-cta__inner">
+        <div>
+          <h2 class="catalog-cta__heading">Не уверены, какой HPL выбрать?</h2>
+          <p class="catalog-cta__desc">Расскажите о проекте — поможем подобрать материал, толщину и подходящие технические характеристики под вашу задачу.</p>
+        </div>
+        <div class="catalog-cta__buttons">
+          <button class="border-red-button js-open-callback" type="button">Помочь с подбором</button>
+          <button class="common-button js-open-spec" type="button">Отправить спецификацию</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEO-текст из контента ресурса -->
+    <section class="catalog-seo section-fc">
+      <div class="section-fc__container">
+        [[*content*]]
+      </div>
+    </section>
+
+  </main>
+
+  [[*footer*]]
+
+  [[*popups*]]
+
+  <div class="toast" id="toast"></div>
+
+  <!-- JS: базовый + JS каталога (работает с предрендеренными карточками) -->
+  <script src="[[++site_url]]assets/templates/assets/js/main.js?v=[[++core_version]]"></script>
+  <script src="[[++site_url]]assets/templates/assets/js/catalog.js?v=[[++core_version]]"></script>
+</body>
+</html>
