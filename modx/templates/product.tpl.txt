@@ -19,6 +19,10 @@
   <title>[[*pagetitle:default=`HPL панели Lemark`]] — купить HPL от производителя</title>
   <meta name="description" content="[[*description:default=`HPL-панели Lemark: технические характеристики, декоры, раскрой по чертежам. Производство полного цикла.`*]]">
   <link rel="canonical" href="[[++site_url]][[*alias*]]/">
+  <!-- Страховка: если VisueltPro не загрузится, fallback Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Базовые стили раздела: чанк style.css -->
   <style>

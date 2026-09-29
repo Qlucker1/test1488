@@ -107,7 +107,9 @@ function check(name, cond, extra = '') {
   check('first card is 12mm partitions', grid.innerHTML.includes('HPL панели 12 мм для сантехнических перегородок'));
   check('card links to product.html?id=', grid.innerHTML.includes('product.html?id=hpl-12-peregorodki'));
   check('badge rendered', grid.innerHTML.includes('product-card__badge'));
-  check('pills generated from JSON (8 apps + Все сферы)', count(pills.innerHTML, 'class="catalog-pill') === 9, 'got ' + count(pills.innerHTML, 'class="catalog-pill'));
+  check('pills generated from JSON (7 сфер + «Все сферы» в конце)', count(pills.innerHTML, 'class="catalog-pill') === 8, 'got ' + count(pills.innerHTML, 'class="catalog-pill'));
+  check('«Все сферы» без дубля и в конце', count(pills.innerHTML, '>Все сферы</button>') === 1 && pills.innerHTML.lastIndexOf('Все сферы') > pills.innerHTML.lastIndexOf('Транспорт'));
+  check('первая карточка: бейдж KM1 на фото', grid.innerHTML.includes('product-card__fire-badge') && grid.innerHTML.includes('>KM1</span>'));
 
   (loadmoreBtn._listeners['click'] || []).forEach(fn => fn({ target: loadmoreBtn, closest: () => loadmoreBtn }));
   await wait(30);
@@ -170,12 +172,13 @@ function check(name, cond, extra = '') {
 
   check('title rendered', title.textContent === 'HPL панели 12 мм для сантехнических перегородок', title.textContent);
   check('specs: Толщина 12 мм', specs.innerHTML.includes('12 мм') && specs.innerHTML.includes('Тип материала'));
-  check('price: от 4 200 ₽/м²', price.innerHTML.includes('4 200') && price.innerHTML.includes('/м²'), price.innerHTML);
+  check('price: от 4 200 ₽/м² (без дубля ₽)', price.innerHTML.includes('4 200') && price.innerHTML.includes('/м²') && price.innerHTML.indexOf('₽ ₽') === -1, price.innerHTML);
+  check('specs: «Применение» — полный текст', specs.innerHTML.includes('Сантехнические и душевые перегородки'));
   check('gallery image set', gallery.src === 'assets/img/products/p01.svg', gallery.src);
   check('production days fact', facts.textContent === 'от 10 рабочих дней', facts.textContent);
   check('breadcrumbs: MARK, Каталог HPL', crumbs.innerHTML.includes('Каталог HPL') && crumbs.innerHTML.includes('MARK'));
-  check('thickness chips 6/8/10/12/16/25', ['6', '8', '10', '12', '16', '25'].every(t => thicks.innerHTML.includes(t + ' мм')));
-  check('current thickness marked', thicks.innerHTML.includes('is-current'));
+  check('thickness chips 6/8/10/12/16/25 (без категорий)', ['6', '8', '10', '12', '16', '25'].every(t => thicks.innerHTML.includes(t + ' мм')) && !thicks.innerHTML.includes('Laboratory'));
+  check('current thickness marked «— текущая»', thicks.innerHTML.includes('is-current') && thicks.innerHTML.includes('— текущая'));
   check('config summary: 0101 + Super Matt', configSummary.innerHTML.includes('0101') && configSummary.innerHTML.includes('Super Matt'), configSummary.innerHTML);
   check('decor grid: 8 solid swatches', count(decorGrid.innerHTML, 'class="decor-swatch"') === 8, 'got ' + count(decorGrid.innerHTML, 'class="decor-swatch"'));
   check('techspec: 3 groups', count(tech.innerHTML, 'class="techspec-group"') === 3 && tech.innerHTML.includes('Абсолютная'));

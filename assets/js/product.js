@@ -108,7 +108,7 @@
     return '' +
       '<div class="product-specs__row"><dt>Толщина</dt><dd>' + esc(p.thickness) + ' мм</dd></div>' +
       '<div class="product-specs__row"><dt>Тип материала</dt><dd>' + esc(p.category) + '</dd></div>' +
-      '<div class="product-specs__row"><dt>Применение</dt><dd>' + esc(apps || 'Универсальное') + '</dd></div>' +
+      '<div class="product-specs__row"><dt>Применение</dt><dd>' + esc(p.application_text || apps || 'Универсальное') + '</dd></div>' +
       '<div class="product-specs__row"><dt>Декоры</dt><dd>3156 / выбор из каталога</dd></div>' +
       '<div class="product-specs__row"><dt>Обработка</dt><dd>Раскрой и CNC по запросу</dd></div>' +
       '<div class="product-specs__row"><dt>Формат</dt><dd>3050 × 1320 мм, 3050 × 1570 мм</dd></div>';
@@ -117,7 +117,9 @@
   function priceHtml(p) {
     var pr = p.price || {};
     if (pr.kind === 'from') {
-      return esc(pr.value) + ' <small>₽/м²</small>';
+      // «от 4 200 ₽» из данных → «от 4 200 ₽/м²» (как в макете, без дубля ₽)
+      var v = String(pr.value || '').replace(/ ₽\s*$/, '');
+      return esc(v) + ' <small>₽/м²</small>';
     }
     if (pr.kind === 'request') {
       return esc(pr.value || 'Цена по запросу');
@@ -184,7 +186,7 @@
 
     els.thicknessChips.innerHTML = ths.map(function (t) {
       if (t === p.thickness) {
-        return '<span class="thickness-chip is-current">' + t + ' мм<small>текущая</small></span>';
+        return '<span class="thickness-chip is-current">' + t + ' мм<small>— текущая</small></span>';
       }
       // ищем товар этой толщины: сначала с пересекающейся сферой
       var target = state.products.find(function (x) {
@@ -192,8 +194,7 @@
           x.applications.some(function (k) { return p.applications.indexOf(k) !== -1; });
       }) || state.products.find(function (x) { return x.thickness === t; });
       if (!target) return '';
-      return '<a class="thickness-chip" href="' + esc(productUrl(target)) + '">' +
-             t + ' мм<small>' + esc(target.category) + '</small></a>';
+      return '<a class="thickness-chip" href="' + esc(productUrl(target)) + '">' + t + ' мм</a>';
     }).join('');
   }
 

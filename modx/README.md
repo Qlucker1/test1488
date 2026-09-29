@@ -97,6 +97,8 @@ https://ваш-сайт/assets/hpl_install.php?secret=лемарк2026&parent=1
 | `category` | список | Compact HPL / Standard HPL / Facade HPL / Laboratory HPL |
 | `applications` | список (много) | faades, peregorodki, medicina, laboratorii, orientka, mebel, transport, vse |
 | `thickness` | число | толщина, мм (4…25) |
+| `fire_class` | текст | бейдж на фото карточки, например `KM1` (пусто = не показывается) |
+| `application_text` | текст | «Применение» на карточке товара (пусто = список сфер) |
 | `tags` | текст | 3 тега через `|` (например `12 мм\|Влагостойкий\|Антибактериальный`) |
 | `stock` | список | `in_stock` (В наличии) / `under_order` (Под заказ) / `request` (По запросу) |
 | `price_kind` | список | `from` (цена от) / `term` (срок) / `request` (по запросу) |

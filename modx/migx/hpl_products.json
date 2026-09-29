@@ -58,6 +58,22 @@
     },
     {
       "type": "input",
+      "class": "migx-col-1",
+      "name": "fire_class",
+      "caption": "Пожарный класс",
+      "description": "Бейдж на изображении карточки, например: KM1 (пусто = не показывается)",
+      "options": { "maxlength": "16" }
+    },
+    {
+      "type": "input",
+      "class": "migx-col-2",
+      "name": "application_text",
+      "caption": "Применение (развернутое)",
+      "description": "Для строки «Применение» на карточке товара, например: «Сантехнические и душевые перегородки» (пусто = список сфер)",
+      "options": { "maxlength": "255" }
+    },
+    {
+      "type": "input",
       "class": "migx-col-2",
       "name": "tags",
       "caption": "Теги (через |)",

@@ -23,6 +23,10 @@
   <title>[[*pagetitle:default=`Каталог HPL-панелей Lemark`]] — производитель HPL-пластика</title>
   <meta name="description" content="[[*description:default=`Каталог HPL-панелей Lemark: подберите HPL по применению, типу материала, толщине и характеристикам. Более 3156 декоров.`*]]">
   <link rel="canonical" href="[[++site_url]][[*alias:default=`katalog-hpl`*]]/">
+  <!-- Страховка: если VisueltPro не загрузится, fallback Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Базовые стили раздела: чанк style.css -->
   <style>
@@ -54,8 +58,8 @@
         <!-- Фильтр по применению (JS также работает в режиме предрендеренных карточек) -->
         <section class="catalog-filter" aria-label="Фильтр по применению">
           <span class="catalog-filter__label">Подберите HPL по применению</span>
+          <!-- Порядок как в макете: сферы, затем «Все сферы» (в конце) -->
           <div class="catalog-filter__pills" id="catalogPills">
-            <button class="catalog-pill is-active" type="button" data-app="all">Все сферы</button>
             <button class="catalog-pill" type="button" data-app="faades">Фасады</button>
             <button class="catalog-pill" type="button" data-app="peregorodki">Перегородки</button>
             <button class="catalog-pill" type="button" data-app="medicina">Медицина</button>
@@ -63,6 +67,7 @@
             <button class="catalog-pill" type="button" data-app="orientka">Отделка</button>
             <button class="catalog-pill" type="button" data-app="mebel">Мебель</button>
             <button class="catalog-pill" type="button" data-app="transport">Транспорт</button>
+            <button class="catalog-pill is-active" type="button" data-app="all">Все сферы</button>
           </div>
         </section>
 
@@ -75,8 +80,7 @@
             <span>Сортировка:</span>
             <select id="catalogSort" aria-label="Сортировка">
               <option value="recommended">Сначала рекомендуемые</option>
-              <option value="thickness_asc">По толщине (сначала тонкие)</option>
-              <option value="thickness_desc">По толщине (сначала толстые)</option>
+              <option value="thickness">По толщине</option>
               <option value="name">По названию</option>
             </select>
           </div>

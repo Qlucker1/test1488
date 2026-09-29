@@ -73,7 +73,8 @@
       ' data-stock="' + esc(p.stock || '') + '"' +
       ' data-price-kind="' + esc((p.price && p.price.kind) || '') + '"' +
       ' data-price-label="' + esc((p.price && p.price.label) || '') + '"' +
-      ' data-price-value="' + esc((p.price && p.price.value) || '') + '"';
+      ' data-price-value="' + esc((p.price && p.price.value) || '') + '"' +
+      ' data-fire-class="' + esc(p.fire_class || '') + '"';
   }
 
   function cardHtml(p) {
@@ -84,11 +85,16 @@
     var badge = s.label
       ? '<span class="product-card__badge ' + s.cls + '">' + s.label + '</span>'
       : '';
+    // Второй бейдж на изображении: пожарный класс (как в макете: KM1)
+    var fireBadge = p.fire_class
+      ? '<span class="product-card__fire-badge">' + esc(p.fire_class) + '</span>'
+      : '';
     var url = productUrl(p);
     return '' +
       '<article class="product-card"' + cardDataAttrs(p) + '>' +
         '<a class="product-card__picture" href="' + esc(url) + '">' +
           badge +
+          fireBadge +
           '<img src="' + esc(p.image) + '" alt="' + esc(p.title) + '" loading="lazy">' +
         '</a>' +
         '<div class="product-card__body">' +
@@ -121,6 +127,7 @@
     }
 
     switch (state.sort) {
+      case 'thickness':
       case 'thickness_asc':
         list.sort(function (a, b) { return a.thickness - b.thickness; });
         break;
@@ -192,12 +199,16 @@
     }
   }
 
-  /* Генерация пилюль (только для Netlify-режима; в MODX пилюли рендерятся сервером) */
+  /* Генерация пилюль (только для Netlify-режима; в MODX пилюли рендерятся сервером).
+     Порядок как в макете: сферы, затем «Все сферы» (в конце).
+     Ключ «vse» из справочника не рендерим отдельной пилюлей — это и есть «Все сферы». */
   function renderPills() {
-    var html = '<button class="catalog-pill is-active" type="button" data-app="all">Все сферы</button>';
+    var html = '';
     Object.keys(state.apps).forEach(function (k) {
+      if (k === 'vse') return;
       html += '<button class="catalog-pill" type="button" data-app="' + esc(k) + '">' + esc(state.apps[k]) + '</button>';
     });
+    html += '<button class="catalog-pill is-active" type="button" data-app="all">Все сферы</button>';
     els.pills.innerHTML = html;
     bindPills();
   }
@@ -260,6 +271,7 @@
           image: d.image,
           stock: d.stock,
           href: d.href || null,
+          fire_class: d.fireClass || '',
           price: d.priceValue ? { kind: d.priceKind, label: d.priceLabel, value: d.priceValue } : null
         };
       });

@@ -1,6 +1,11 @@
 /* ==========================================================================
-   ЧАНК MODX: product.css — CSS страницы «Карточка товара HPL».
-   Вставляется в <head> рядом с чанком style.css (см. шаблон HPL Product).
+   ЧАНК MODX: ch
+   СКОПИРОВАНО ИЗ assets/css/product.css — правки вносите в исходнике репозитория.
+   ========================================================================== */
+
+/* ==========================================================================
+   Карточка товара HPL — CSS страницы (отдельный чанк для MODX,
+   подключается рядом с style.css)
    ========================================================================== */
 
 /* ---------- Хлебные крошки ---------- */
@@ -101,8 +106,9 @@
   padding: 0.6em 1.2em;
 }
 
-/* Правая колонка: описание */
+/* Правая колонка: описание (3-я колонка сетки: 1fr | 5em | 1fr) */
 .product-info {
+  grid-column: 3;
   display: flex;
   flex-direction: column;
 }
@@ -939,6 +945,9 @@
   grid-template-columns: 1fr 5em 1fr;
   align-items: start;
 }
+.product-calc__form {
+  grid-column: 3;
+}
 .product-calc__heading {
   font-weight: 900;
   font-size: 2.2em;
@@ -1035,6 +1044,9 @@
     grid-template-columns: 1fr;
     gap: 2.5em;
   }
+  .product-info {
+    grid-column: 1;
+  }
   .product-info__title {
     font-size: 1.6em;
   }
@@ -1082,6 +1094,9 @@
   .product-calc__grid {
     grid-template-columns: 1fr;
     gap: 3em;
+  }
+  .product-calc__form {
+    grid-column: 1;
   }
   .product-calc__heading {
     font-size: 1.7em;

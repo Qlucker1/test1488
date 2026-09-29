@@ -6,6 +6,11 @@
   <title>Каталог HPL-панелей Lemark — производитель HPL пластика</title>
   <meta name="description" content="Каталог HPL-панелей Lemark: подберите HPL по применению, типу материала, толщине и характеристикам. Более 3156 декоров, производство полного цикла.">
   <link rel="preconnect" href="https://lemarkllc.ru">
+  <!-- VisueltPro грузится с lemarkllc.ru; если кросс-домен заблокирован CORS —
+       fallback Inter (визуально близок). На MODX шрифт свой — fallback не нужен. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <!-- Базовые стили (аналог чанка style.css) -->
   <link rel="stylesheet" href="assets/css/style.css">
   <!-- CSS каталога — отдельный чанк рядом со style.css (см. modx/) -->
@@ -113,8 +118,7 @@
             <span>Сортировка:</span>
             <select id="catalogSort" aria-label="Сортировка">
               <option value="recommended">Сначала рекомендуемые</option>
-              <option value="thickness_asc">По толщине (сначала тонкие)</option>
-              <option value="thickness_desc">По толщине (сначала толстые)</option>
+              <option value="thickness">По толщине</option>
               <option value="name">По названию</option>
             </select>
           </div>

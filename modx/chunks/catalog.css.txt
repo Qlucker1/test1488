@@ -1,6 +1,11 @@
 /* ==========================================================================
-   ЧАНК MODX: catalog.css — CSS страницы «Каталог HPL».
-   Вставляется в <head> рядом с чанком style.css (см. шаблон HPL Catalog).
+   ЧАНК MODX: ch
+   СКОПИРОВАНО ИЗ assets/css/catalog.css — правки вносите в исходнике репозитория.
+   ========================================================================== */
+
+/* ==========================================================================
+   Каталог HPL-панелей — CSS страницы (отдельный чанк для MODX,
+   подключается рядом с style.css)
    ========================================================================== */
 
 /* ---------- Верх блока: заголовок страницы ---------- */
@@ -234,6 +239,21 @@
   background: #f5c518;
 }
 
+/* Второй бейдж на изображении: пожарный класс (KM1) — как в макете */
+.product-card__fire-badge {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  z-index: 2;
+  font-size: 0.68em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.6em 1em;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--dark);
+  border: 1px solid var(--line);
+}
+
 .product-card__body {
   display: flex;
   flex-direction: column;
@@ -323,6 +343,9 @@
   justify-content: center;
   margin-top: 3em;
 }
+.catalog-loadmore[hidden] {
+  display: none;
+}
 .catalog-loadmore .border-red-button {
   min-width: 22em;
   text-align: center;
@@ -344,6 +367,7 @@
   grid-template-columns: var(--gaps) 1fr var(--gaps);
 }
 .catalog-cta__inner {
+  grid-column: 2;
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 3em;

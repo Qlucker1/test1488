@@ -128,6 +128,11 @@ foreach ($items as $it) {
         }
     }
 
+    $fireClass = trim((string)isset($it['fire_class']) ? $it['fire_class'] : '');
+    $fireBadge = $fireClass !== ''
+        ? '<span class="product-card__fire-badge">' . htmlspecialchars($fireClass, ENT_QUOTES) . '</span>'
+        : '';
+
     $props = array(
         'id'          => (string)(isset($it['id']) ? (int)$it['id'] : 0),
         'slug'        => htmlspecialchars($slug, ENT_QUOTES),
@@ -141,6 +146,8 @@ foreach ($items as $it) {
         'price_kind'  => trim((string)isset($it['price_kind']) ? $it['price_kind'] : ''),
         'price_label' => htmlspecialchars(trim((string)isset($it['price_label']) ? $it['price_label'] : ''), ENT_QUOTES),
         'price_value' => htmlspecialchars(trim((string)isset($it['price_value']) ? $it['price_value'] : ''), ENT_QUOTES),
+        'fire_class'  => htmlspecialchars($fireClass, ENT_QUOTES),
+        'fire_badge'  => $fireBadge,
         'badge'       => isset($stockBadges[$stock]) ? $stockBadges[$stock] : '',
         'url'         => htmlspecialchars($url, ENT_QUOTES),
     );

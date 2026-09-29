@@ -16,9 +16,11 @@
   data-stock="[[+stock*]]"
   data-price-kind="[[+price_kind*]]"
   data-price-label="[[+price_label*]]"
-  data-price-value="[[+price_value*]]">
+  data-price-value="[[+price_value*]]"
+  data-fire-class="[[+fire_class*]]">
   <a class="product-card__picture" href="[[+url*]]">
     [[+badge*]]
+    [[+fire_badge*]]
     <img src="[[+image*]]" alt="[[+title*]]" loading="lazy">
   </a>
   <div class="product-card__body">
