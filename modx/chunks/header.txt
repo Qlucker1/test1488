@@ -1,0 +1,79 @@
+<!-- ==========================================================================
+  ЧАНК MODX: header
+  Шапка раздела «Каталог HPL» — идентична шапке lemarkllc.ru
+  (логотип LEMARK, меню, телефон, «Перезвоните мне», мобильное меню).
+
+  ВНИМАНИЕ: если у вас на сайте алиасы отличаются — замените пути ниже
+  на актуальные (по умолчанию стоят алиасы из robots.txt lemarkllc.ru).
+  ========================================================================== -->
+<header class="header">
+  <a class="header__logo" href="[[++site_url]]" aria-label="Lemark — на главную">LEMARK<span>.</span></a>
+
+  <nav class="header__nav" aria-label="Основное меню">
+    <a class="header__nav-item" href="[[++site_url]]">Главная</a>
+
+    <div class="header__nav-item" data-menu>
+      <span>Каталог декоров</span><i class="caret"></i>
+      <div class="header__nav-dropdown">
+        <a href="[[++site_url]]katalog-dekorov-hpl/odnotonnyie/">Однотонные</a>
+        <a href="[[++site_url]]katalog-dekorov-hpl/derevyannye/">Деревянные</a>
+        <a href="[[++site_url]]katalog-dekorov-hpl/kamennye/">Каменные</a>
+        <a href="[[++site_url]]katalog-dekorov-hpl/fantaziynye/">Фантазийные</a>
+        <a href="[[++site_url]]katalog-dekorov-hpl/metallizirovannye/">Металлизированные</a>
+      </div>
+    </div>
+
+    <a class="header__nav-item" href="[[++site_url]]katalog-hpl/">Каталог HPL</a>
+
+    <div class="header__nav-item" data-menu>
+      <span>Полезная информация</span><i class="caret"></i>
+      <div class="header__nav-dropdown">
+        <a href="[[++site_url]]poleznaya-informacziya/rekomendacziyi-po-rabote-s-hpl/">Рекомендации по работе с HPL</a>
+        <a href="[[++site_url]]poleznaya-informacziya/texnicheskoe-opisanie-hpl/">Техническое описание HPL</a>
+        <a href="[[++site_url]]poleznaya-informacziya/voprosy-i-otveti/">Вопросы и ответы</a>
+      </div>
+    </div>
+
+    <a class="header__nav-item" href="[[++site_url]]o-kompanii/">О компании</a>
+    <a class="header__nav-item" href="[[++site_url]]contacts/">Контакты</a>
+  </nav>
+
+  <div class="header__right">
+    <a class="header__phone" href="tel:+74952216336">+7 (495) 221-63-36</a>
+    <button class="border-red-button header__callback js-open-callback" type="button">Перезвоните мне</button>
+  </div>
+
+  <button class="menu-button js-menu-toggle" type="button" aria-label="Открыть меню">
+    <span class="menu-button__line menu-button__line_1"></span>
+    <span class="menu-button__line menu-button__line_2"></span>
+    <span class="menu-button__line menu-button__line_3"></span>
+  </button>
+</header>
+
+<!-- Мобильное меню (сайдбар) -->
+<div class="menu-side-overlay js-menu-overlay"></div>
+<aside class="menu-side" aria-label="Мобильное меню">
+  <span class="menu-side__title">Меню</span>
+  <a class="menu-side__item" href="[[++site_url]]">Главная</a>
+  <div class="menu-side__item">
+    Каталог декоров
+    <a href="[[++site_url]]katalog-dekorov-hpl/odnotonnyie/">Однотонные</a>
+    <a href="[[++site_url]]katalog-dekorov-hpl/derevyannye/">Деревянные</a>
+    <a href="[[++site_url]]katalog-dekorov-hpl/kamennye/">Каменные</a>
+    <a href="[[++site_url]]katalog-dekorov-hpl/fantaziynye/">Фантазийные</a>
+    <a href="[[++site_url]]katalog-dekorov-hpl/metallizirovannye/">Металлизированные</a>
+  </div>
+  <a class="menu-side__item" href="[[++site_url]]katalog-hpl/">Каталог HPL</a>
+  <div class="menu-side__item">
+    Полезная информация
+    <a href="[[++site_url]]poleznaya-informacziya/rekomendacziyi-po-rabote-s-hpl/">Рекомендации по работе с HPL</a>
+    <a href="[[++site_url]]poleznaya-informacziya/texnicheskoe-opisanie-hpl/">Техническое описание HPL</a>
+    <a href="[[++site_url]]poleznaya-informacziya/voprosy-i-otveti/">Вопросы и ответы</a>
+  </div>
+  <a class="menu-side__item" href="[[++site_url]]o-kompanii/">О компании</a>
+  <a class="menu-side__item" href="[[++site_url]]contacts/">Контакты</a>
+  <span class="menu-side__title">Контакты</span>
+  <a class="menu-side__item" href="tel:+74952216336">+7 (495) 221-63-36</a>
+  <a class="menu-side__item" href="mailto:sales@lemarkllc.ru">sales@lemarkllc.ru</a>
+  <button class="common-button js-open-callback" type="button" style="margin-top:1em;">Перезвоните мне</button>
+</aside>

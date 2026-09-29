@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Каталог HPL-панелей Lemark — производитель HPL пластика</title>
+  <meta name="description" content="Каталог HPL-панелей Lemark: подберите HPL по применению, типу материала, толщине и характеристикам. Более 3156 декоров, производство полного цикла.">
+  <link rel="preconnect" href="https://lemarkllc.ru">
+  <!-- VisueltPro грузится с lemarkllc.ru; если кросс-домен заблокирован CORS —
+       fallback Inter (визуально близок). На MODX шрифт свой — fallback не нужен. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Базовые стили (аналог чанка style.css) -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <!-- CSS каталога — отдельный чанк рядом со style.css (см. modx/) -->
+  <link rel="stylesheet" href="assets/css/catalog.css">
+</head>
+<body>
+
+  <!-- ============ ШАПКА (чанк [[*header*]]) ============ -->
+  <header class="header">
+    <a class="header__logo" href="index.html" aria-label="Lemark — на главную">LEMARK<span>.</span></a>
+
+    <nav class="header__nav" aria-label="Основное меню">
+      <a class="header__nav-item" href="index.html">Главная</a>
+
+      <div class="header__nav-item" data-menu>
+        <span>Каталог декоров</span><i class="caret"></i>
+        <div class="header__nav-dropdown">
+          <a href="https://lemarkllc.ru/katalog-dekorov-hpl/odnotonnyie/">Однотонные</a>
+          <a href="https://lemarkllc.ru/katalog-dekorov-hpl/derevyannye/">Деревянные</a>
+          <a href="https://lemarkllc.ru/katalog-dekorov-hpl/kamennye/">Каменные</a>
+          <a href="https://lemarkllc.ru/katalog-dekorov-hpl/fantaziynye/">Фантазийные</a>
+          <a href="https://lemarkllc.ru/katalog-dekorov-hpl/metallizirovannye/">Металлизированные</a>
+        </div>
+      </div>
+
+      <a class="header__nav-item" href="index.html">Каталог HPL</a>
+
+      <div class="header__nav-item" data-menu>
+        <span>Полезная информация</span><i class="caret"></i>
+        <div class="header__nav-dropdown">
+          <a href="https://lemarkllc.ru/poleznaya-informacziya/rekomendacziyi-po-rabote-s-hpl/">Рекомендации по работе с HPL</a>
+          <a href="https://lemarkllc.ru/poleznaya-informacziya/texnicheskoe-opisanie-hpl/">Техническое описание HPL</a>
+          <a href="https://lemarkllc.ru/poleznaya-informacziya/voprosy-i-otveti/">Вопросы и ответы</a>
+        </div>
+      </div>
+
+      <a class="header__nav-item" href="https://lemarkllc.ru/o-kompanii/">О компании</a>
+      <a class="header__nav-item" href="https://lemarkllc.ru/contacts/">Контакты</a>
+    </nav>
+
+    <div class="header__right">
+      <a class="header__phone" href="tel:+74952216336">+7 (495) 221-63-36</a>
+      <button class="border-red-button header__callback js-open-callback" type="button">Перезвоните мне</button>
+    </div>
+
+    <button class="menu-button js-menu-toggle" type="button" aria-label="Открыть меню">
+      <span class="menu-button__line menu-button__line_1"></span>
+      <span class="menu-button__line menu-button__line_2"></span>
+      <span class="menu-button__line menu-button__line_3"></span>
+    </button>
+  </header>
+
+  <!-- Мобильное меню -->
+  <div class="menu-side-overlay js-menu-overlay"></div>
+  <aside class="menu-side" aria-label="Мобильное меню">
+    <span class="menu-side__title">Меню</span>
+    <a class="menu-side__item" href="index.html">Главная</a>
+    <div class="menu-side__item">
+      Каталог декоров
+      <a href="https://lemarkllc.ru/katalog-dekorov-hpl/odnotonnyie/">Однотонные</a>
+      <a href="https://lemarkllc.ru/katalog-dekorov-hpl/derevyannye/">Деревянные</a>
+      <a href="https://lemarkllc.ru/katalog-dekorov-hpl/kamennye/">Каменные</a>
+      <a href="https://lemarkllc.ru/katalog-dekorov-hpl/fantaziynye/">Фантазийные</a>
+      <a href="https://lemarkllc.ru/katalog-dekorov-hpl/metallizirovannye/">Металлизированные</a>
+    </div>
+    <a class="menu-side__item" href="index.html">Каталог HPL</a>
+    <div class="menu-side__item">
+      Полезная информация
+      <a href="https://lemarkllc.ru/poleznaya-informacziya/rekomendacziyi-po-rabote-s-hpl/">Рекомендации по работе с HPL</a>
+      <a href="https://lemarkllc.ru/poleznaya-informacziya/texnicheskoe-opisanie-hpl/">Техническое описание HPL</a>
+      <a href="https://lemarkllc.ru/poleznaya-informacziya/voprosy-i-otveti/">Вопросы и ответы</a>
+    </div>
+    <a class="menu-side__item" href="https://lemarkllc.ru/o-kompanii/">О компании</a>
+    <a class="menu-side__item" href="https://lemarkllc.ru/contacts/">Контакты</a>
+    <span class="menu-side__title">Контакты</span>
+    <a class="menu-side__item" href="tel:+74952216336">+7 (495) 221-63-36</a>
+    <a class="menu-side__item" href="mailto:sales@lemarkllc.ru">sales@lemarkllc.ru</a>
+    <button class="common-button js-open-callback" type="button" style="margin-top:1em;">Перезвоните мне</button>
+  </aside>
+
+  <main class="main-content">
+    <div class="header-placeholder"></div>
+
+    <div class="section-fc" style="grid-template-columns: var(--gaps) 1fr var(--gaps);">
+      <div class="section-fc__container" style="width:100%;">
+
+        <!-- Заголовок страницы -->
+        <section class="catalog-intro">
+          <h1 class="catalog-intro__heading">Каталог HPL-панелей Lemark</h1>
+          <p class="catalog-intro__desc">Подберите HPL по применению, типу материала, толщине и характеристикам.</p>
+        </section>
+
+        <!-- Быстрый фильтр по применению (иконки, как в макете) -->
+        <section class="catalog-apps" id="catalogApps" aria-label="Подберите HPL по применению">
+          <span class="catalog-apps__label">Подберите HPL по применению</span>
+          <div class="catalog-apps__grid">
+            <button class="app-tile" type="button" data-app="faades">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 21h18M5 21V5.5L12 3v18M12 21V8l7 2.5V21M8 8h.01M8 11h.01M8 14h.01M8 17h.01M15.5 13h.01M15.5 16h.01"/></svg>
+              <span>Фасады</span>
+            </button>
+            <button class="app-tile" type="button" data-app="peregorodki">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M4 9h16M15 6h.01M8 13v4"/></svg>
+              <span>Перегородки</span>
+            </button>
+            <button class="app-tile" type="button" data-app="medicina">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+              <span>Медицина</span>
+            </button>
+            <button class="app-tile" type="button" data-app="laboratorii">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M9 3h6M10 3v6.3L4.8 18a2 2 0 0 0 1.8 3h10.8a2 2 0 0 0 1.8-3L14 9.3V3M7.5 14h9"/></svg>
+              <span>Лаборатории</span>
+            </button>
+            <button class="app-tile" type="button" data-app="orientka">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 11l9-8 9 8M5.5 9.5V21h13V9.5M10 21v-6h4v6"/></svg>
+              <span>Отделка</span>
+            </button>
+            <button class="app-tile" type="button" data-app="mebel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M6 11V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v6M4 18v-3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3M4 18h16M6 18v2M18 18v2"/></svg>
+              <span>Мебель</span>
+            </button>
+            <button class="app-tile" type="button" data-app="transport">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="4" y="4" width="16" height="13" rx="2"/><path d="M4 10h16M8 21l1-2.5M16 21l-1-2.5M8.5 14h.01M15.5 14h.01"/></svg>
+              <span>Транспорт</span>
+            </button>
+            <button class="app-tile app-tile--all is-active" type="button" data-app="all">
+              <span>Все сферы</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- ============ Фильтры (слева, доп. параметры) + каталог (справа) ============ -->
+        <div class="catalog-layout">
+
+          <!-- Сайдбар доп. фильтров (статичный; JS фильтрует сетку) -->
+          <aside class="catalog-filters" id="catalogFilters" aria-label="Фильтры каталога">
+            <div class="catalog-filters__head">
+              <h2 class="catalog-filters__title">Фильтры</h2>
+              <button class="catalog-filters__reset js-reset" type="button">Сбросить</button>
+            </div>
+
+            <div class="catalog-filters__group">
+              <h3 class="catalog-filters__label">Тип материала</h3>
+              <label class="check"><input type="checkbox" data-filter="category" value="Compact HPL"><span class="check__box"></span>Compact HPL</label>
+              <label class="check"><input type="checkbox" data-filter="category" value="Standard HPL"><span class="check__box"></span>Standard HPL</label>
+              <label class="check"><input type="checkbox" data-filter="category" value="Facade HPL"><span class="check__box"></span>Facade HPL</label>
+              <label class="check"><input type="checkbox" data-filter="category" value="Laboratory HPL"><span class="check__box"></span>Laboratory HPL</label>
+            </div>
+
+            <div class="catalog-filters__group">
+              <h3 class="catalog-filters__label">Толщина</h3>
+              <div class="catalog-filters__thickness">
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="4">4 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="6">6 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="8">8 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="10">10 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="12">12 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="16">16 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="25">25 мм</button>
+              </div>
+            </div>
+
+            <div class="catalog-filters__group">
+              <h3 class="catalog-filters__label">Специальные свойства</h3>
+              <label class="check"><input type="checkbox" data-filter="property" value="fire"><span class="check__box"></span>Трудногорючий</label>
+              <label class="check"><input type="checkbox" data-filter="property" value="biocidal"><span class="check__box"></span>Биоцидный</label>
+              <label class="check"><input type="checkbox" data-filter="property" value="chemical"><span class="check__box"></span>Химически стойкий</label>
+              <label class="check"><input type="checkbox" data-filter="property" value="moisture"><span class="check__box"></span>Влагостойкий</label>
+            </div>
+
+            <button class="catalog-filters__more js-filters-more" type="button" aria-expanded="false">
+              <span class="catalog-filters__more-icon">+</span>Дополнительные параметры
+            </button>
+            <div class="catalog-filters__extra" id="catalogFiltersExtra" hidden>
+              <div class="catalog-filters__group">
+                <h3 class="catalog-filters__label">Наличие</h3>
+                <label class="check"><input type="checkbox" data-filter="stock" value="in_stock"><span class="check__box"></span>В наличии</label>
+                <label class="check"><input type="checkbox" data-filter="stock" value="under_order"><span class="check__box"></span>Под заказ</label>
+                <label class="check"><input type="checkbox" data-filter="stock" value="request"><span class="check__box"></span>По запросу</label>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Контент каталога -->
+          <div class="catalog-main">
+
+            <!-- Панель результатов -->
+            <div class="catalog-toolbar">
+              <span class="catalog-toolbar__count" id="catalogCount">Найдено <b>…</b> решений</span>
+              <div class="catalog-chips" id="catalogChips"><!-- JS: активные фильтры --></div>
+              <div class="catalog-sort">
+                <span>Сортировка:</span>
+                <select id="catalogSort" aria-label="Сортировка">
+                  <option value="recommended">Сначала рекомендуемые</option>
+                  <option value="thickness">По толщине</option>
+                  <option value="name">По названию</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Сетка карточек -->
+            <section class="catalog-grid" id="catalogGrid" aria-label="Список товаров"></section>
+
+            <!-- Пусто -->
+            <div class="catalog-empty" id="catalogEmpty" hidden>
+              <b>Ничего не найдено</b>
+              Попробуйте изменить параметры фильтров.
+            </div>
+
+            <!-- Загрузить еще -->
+            <div class="catalog-loadmore" id="catalogLoadmore" hidden>
+              <div>
+                <button class="border-red-button js-loadmore" type="button">Загрузить еще</button>
+                <div class="catalog-loadmore__note" id="catalogLoadmoreNote"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CTA: помощь с подбором -->
+    <section class="catalog-cta">
+      <div class="catalog-cta__inner">
+        <div>
+          <h2 class="catalog-cta__heading">Не уверены, какой HPL выбрать?</h2>
+          <p class="catalog-cta__desc">Расскажите о проекте — поможем подобрать материал, толщину и подходящие технические характеристики под вашу задачу.</p>
+        </div>
+        <div class="catalog-cta__buttons">
+          <button class="border-red-button js-open-callback" type="button">Помочь с подбором</button>
+          <button class="common-button js-open-spec" type="button">Отправить спецификацию</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEO-блок -->
+    <section class="catalog-seo section-fc">
+      <h2 class="section-fc__heading catalog-seo__heading">Каталог HPL Lemark</h2>
+      <div class="section-fc__container">
+        <p>Lemark является ведущим российским производителем декоративного бумажно-слоистого пластика (HPL). Наш каталог включает широкий ассортимент решений для архитектуры, дизайна интерьеров и промышленного применения. Мы предлагаем панели Compact HPL, фасадные решения и специализированные материалы с повышенной износостойкостью.</p>
+        <p>Все материалы производятся на современном оборудовании с соблюдением строгих экологических и технических стандартов. В каталоге представлены как складские позиции, доступные к отгрузке в кратчайшие сроки, так и решения, которые могут быть произведены индивидуально под ваш проект.</p>
+        <p>Система фильтрации позволяет быстро отсортировать материалы по сфере применения — от медицинских учреждений и чистых помещений до транспортного машиностроения и производства мебели. Для каждой позиции доступна подробная техническая документация и сертификаты соответствия.</p>
+        <p>Если вам необходим расчет стоимости проекта или помощь в выборе конкретного декора из нашей коллекции, воспользуйтесь формой обратной связи или свяжитесь с отделом проектных продаж. Мы обеспечиваем полную техническую поддержку на всех этапах реализации объекта.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ ПОДВАЛ (чанк [[*footer*]]) ============ -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__contacts">
+        <div class="footer__contacts-item">
+          <b>Адрес</b>
+          <span>141503, МО, г. Солнечногорск,<br>Бутырский тупик, вл. 4, стр. 1</span>
+        </div>
+        <div class="footer__contacts-item">
+          <b>Телефон</b>
+          <a href="tel:+74952216336">+7 (495) 221-63-36</a>
+        </div>
+        <div class="footer__contacts-item">
+          <b>E-mail</b>
+          <a href="mailto:sales@lemarkllc.ru">sales@lemarkllc.ru</a>
+        </div>
+        <div class="footer__contacts-item">
+          <b>Время работы</b>
+          <span>пн-пт 09:00-18:00</span>
+        </div>
+        <div class="footer__contacts-item">
+          <b>ООО «ЛЕМАРК»</b>
+          <a href="https://yandex.ru/maps/?text=Солнечногорск%20Бутырский%20тупик%204" target="_blank" rel="noopener">Показать на карте</a>
+        </div>
+        <div class="footer__contacts-item">
+          <b>Обратная связь</b>
+          <button class="border-red-button footer__callback js-open-callback" type="button">Перезвоните мне</button>
+        </div>
+      </div>
+
+      <nav class="footer__menu" aria-label="Меню в подвале">
+        <a href="index.html">Главная</a>
+        <a href="https://lemarkllc.ru/katalog-dekorov-hpl/">Каталог декоров</a>
+        <a href="index.html">Каталог HPL</a>
+        <a href="https://lemarkllc.ru/poleznaya-informacziya/">Полезная информация</a>
+        <a href="https://lemarkllc.ru/o-kompanii/">О компании</a>
+        <a href="https://lemarkllc.ru/contacts/">Контакты</a>
+      </nav>
+    </div>
+
+    <div class="footer__copy">
+      <span>© 2008–<span id="footerYear"></span> ООО «ЛЕМАРК» — завод HPL-пластика полного цикла</span>
+      <a href="https://lemarkllc.ru/politika-konfidenczialnosti/">Политика конфиденциальности</a>
+    </div>
+
+    <div class="footer__text-logo" aria-hidden="true">LEMARK</div>
+  </footer>
+
+  <!-- Cookie-плашка -->
+  <div class="cookie-banner" id="cookieBanner">
+    <span>Мы используем файлы cookie, чтобы улучшить работу сайта и его пользование. Продолжая использовать сайт, вы соглашаетесь с <a href="https://lemarkllc.ru/politika-konfidenczialnosti/">политикой использования</a> файлов cookies.</span>
+    <button class="common-button cookie-banner__button" id="cookieAccept" type="button">Принять</button>
+  </div>
+
+  <!-- Поп-ап: обратный звонок -->
+  <div class="popup" id="callbackPopup" role="dialog" aria-modal="true" aria-label="Форма обратного звонка">
+    <div class="common-form">
+      <button class="common-form__close-button js-popup-close" type="button" aria-label="Закрыть"></button>
+      <h3 class="common-form__title">Перезвоните <span>мне</span></h3>
+      <p class="common-form__desc">Оставьте номер — специалист по HPL перезвонит в рабочее время и ответит на вопросы по каталогу.</p>
+      <form class="js-demo-form" data-form-name="callback">
+        <input class="common-form__input" type="text" name="name" placeholder="Ваше имя" required>
+        <input class="common-form__input" type="tel" name="phone" placeholder="Телефон" required>
+        <label class="common-form__terms">
+          <input type="checkbox" name="agree" required>
+          Я даю согласие на обработку персональных данных и принимаю
+          <a href="https://lemarkllc.ru/politika-konfidenczialnosti/" target="_blank" rel="noopener">политику конфиденциальности</a>
+        </label>
+        <button class="common-button common-button_red common-form__submit-button" type="submit">Отправить заявку</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Поп-ап: спецификация -->
+  <div class="popup" id="specPopup" role="dialog" aria-modal="true" aria-label="Отправить спецификацию">
+    <div class="common-form">
+      <button class="common-form__close-button js-popup-close" type="button" aria-label="Закрыть"></button>
+      <h3 class="common-form__title">Отправить <span>спецификацию</span></h3>
+      <p class="common-form__desc">Пришлите размеры или чертежи проекта — подберём материал, декор и рассчитаем стоимость.</p>
+      <form class="js-demo-form" data-form-name="specification">
+        <input class="common-form__input" type="text" name="name" placeholder="Ваше имя" required>
+        <input class="common-form__input" type="tel" name="phone" placeholder="Телефон" required>
+        <input class="common-form__input" type="email" name="email" placeholder="E-mail">
+        <label class="common-form__file-field js-file-field">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-width="2"/></svg>
+          <span class="js-file-label">Прикрепить файл (PDF, DWG, XLSX)</span>
+          <input class="common-form__real-file-input" type="file" name="file">
+        </label>
+        <label class="common-form__terms">
+          <input type="checkbox" name="agree" required>
+          Я даю согласие на обработку персональных данных и принимаю
+          <a href="https://lemarkllc.ru/politika-konfidenczialnosti/" target="_blank" rel="noopener">политику конфиденциальности</a>
+        </label>
+        <button class="common-button common-button_red common-form__submit-button" type="submit">Отправить спецификацию</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Базовый JS (меню, формы, cookie) -->
+  <script src="assets/js/main.js"></script>
+  <!-- JS каталога (аналог чанка каталога) -->
+  <script src="assets/js/catalog.js"></script>
+</body>
+</html>

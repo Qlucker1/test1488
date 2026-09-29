@@ -1,0 +1,52 @@
+<!-- ==========================================================================
+  ЧАНК MODX: popups
+  Общие pop-ап формы раздела: обратный звонок + спецификация.
+  На продакшене формы уходят через AjaxForm (компонент уже установлен на сайте):
+  замените <form class="js-demo-form" ...> на
+  <form class="ajaxForm" data-ajaxform-config="{"url":"/connector-ajaxform/","action":"insert","resource":"ID_РЕСУРСА_ЗАЯВОК"}">
+  — см. modx/README.md, раздел «Формы → AjaxForm».
+  ========================================================================== -->
+
+<!-- Pop-ап: обратный звонок -->
+<div class="popup" id="callbackPopup" role="dialog" aria-modal="true" aria-label="Форма обратного звонка">
+  <div class="common-form">
+    <button class="common-form__close-button js-popup-close" type="button" aria-label="Закрыть"></button>
+    <h3 class="common-form__title">Перезвоните <span>мне</span></h3>
+    <p class="common-form__desc">Оставьте номер — специалист по HPL перезвонит в рабочее время и ответит на вопросы по каталогу.</p>
+    <form class="js-demo-form" data-form-name="callback">
+      <input class="common-form__input" type="text" name="name" placeholder="Ваше имя" required>
+      <input class="common-form__input" type="tel" name="phone" placeholder="Телефон" required>
+      <label class="common-form__terms">
+        <input type="checkbox" name="agree" required>
+        Я даю согласие на обработку персональных данных и принимаю
+        <a href="[[++site_url]]politika-konfidenczialnosti/" target="_blank" rel="noopener">политику конфиденциальности</a>
+      </label>
+      <button class="common-button common-button_red common-form__submit-button" type="submit">Отправить заявку</button>
+    </form>
+  </div>
+</div>
+
+<!-- Pop-ап: спецификация -->
+<div class="popup" id="specPopup" role="dialog" aria-modal="true" aria-label="Отправить спецификацию">
+  <div class="common-form">
+    <button class="common-form__close-button js-popup-close" type="button" aria-label="Закрыть"></button>
+    <h3 class="common-form__title">Отправить <span>спецификацию</span></h3>
+    <p class="common-form__desc">Пришлите размеры или чертежи проекта — подберём материал, декор и рассчитаем стоимость.</p>
+    <form class="js-demo-form" data-form-name="specification">
+      <input class="common-form__input" type="text" name="name" placeholder="Ваше имя" required>
+      <input class="common-form__input" type="tel" name="phone" placeholder="Телефон" required>
+      <input class="common-form__input" type="email" name="email" placeholder="E-mail">
+      <label class="common-form__file-field js-file-field">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-width="2"/></svg>
+        <span class="js-file-label">Прикрепить файл (PDF, DWG, XLSX)</span>
+        <input class="common-form__real-file-input" type="file" name="file">
+      </label>
+      <label class="common-form__terms">
+        <input type="checkbox" name="agree" required>
+        Я даю согласие на обработку персональных данных и принимаю
+        <a href="[[++site_url]]politika-konfidenczialnosti/" target="_blank" rel="noopener">политику конфиденциальности</a>
+      </label>
+      <button class="common-button common-button_red common-form__submit-button" type="submit">Отправить спецификацию</button>
+    </form>
+  </div>
+</div>

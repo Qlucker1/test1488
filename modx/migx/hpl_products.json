@@ -1,0 +1,186 @@
+{
+  "caption": "Каталог HPL (MIGX-грид)",
+  "type": "scaffold",
+  "description": "Грид товаров каталога HPL Lemark. Установщик install.php сохраняет этот конфиг как чанк с именем TV «hpl_products» — MIGX подхватывает его автоматически. Имена полей (name) менять нельзя: их читают snGetHplProducts / snGetHplProduct и frontend JS (catalog.js, product.js).",
+  "template": "<tr class='migx-row' data-migx-row='{row}'><td>{sort}</td><td>{title}</td><td>{category}</td><td>{thickness}</td><td>{stock}</td><td>{price_value}</td></tr>",
+  "objects": [
+    {
+      "type": "input",
+      "class": "migx-col-1",
+      "name": "sort",
+      "caption": "Сортировка",
+      "description": "Число: чем меньше, тем выше товар в каталоге",
+      "options": { "class": "number", "default": "100" }
+    },
+    {
+      "type": "input",
+      "class": "migx-col-2",
+      "name": "title",
+      "caption": "Название товара",
+      "description": "Например: «HPL панели 12 мм для сантехнических перегородок»",
+      "options": { "required": "1", "maxlength": "255" }
+    },
+    {
+      "type": "input",
+      "class": "migx-col-2",
+      "name": "slug",
+      "caption": "Slug (алиас)",
+      "description": "Латиницей, без пробелов. Должен совпадать с alias ресурса-карточки товара",
+      "options": { "required": "1", "pattern": "[a-z0-9-]+" }
+    },
+    {
+      "type": "selectbox",
+      "class": "migx-col-1",
+      "name": "category",
+      "caption": "Тип материала",
+      "description": "Категория на карточке (Compact HPL и т.д.)",
+      "options": { "options": "Compact HPL|Standard HPL|Facade HPL|Laboratory HPL" }
+    },
+    {
+      "type": "listbox",
+      "class": "migx-col-2",
+      "name": "applications",
+      "caption": "Сферы применения",
+      "description": "Множественный выбор — фильтры каталога",
+      "options": {
+        "multiple": "1",
+        "options": "faades|peregorodki|medicina|laboratorii|orientka|mebel|transport|vse",
+        "options_caption": "Фасады|Перегородки|Медицина|Лаборатории|Отделка|Мебель|Транспорт|Все сферы"
+      }
+    },
+    {
+      "type": "input",
+      "class": "migx-col-1",
+      "name": "thickness",
+      "caption": "Толщина, мм",
+      "description": "Целое число: 4, 6, 8, 10, 12, 16, 25",
+      "options": { "required": "1", "class": "number" }
+    },
+    {
+      "type": "input",
+      "class": "migx-col-1",
+      "name": "thicknesses",
+      "caption": "Все толщины (через |)",
+      "description": "Блок «Другие толщины» на карточке, например: 6|12|16|25 (пусто = только основная)",
+      "options": {}
+    },
+    {
+      "type": "input",
+      "class": "migx-col-1",
+      "name": "fire_class",
+      "caption": "Пожарный класс",
+      "description": "Бейдж на изображении карточки, например: KM1 (пусто = не показывается)",
+      "options": { "maxlength": "16" }
+    },
+    {
+      "type": "input",
+      "class": "migx-col-2",
+      "name": "application_text",
+      "caption": "Применение (развернутое)",
+      "description": "Для строки «Применение» на карточке товара, например: «Сантехнические и душевые перегородки» (пусто = список сфер)",
+      "options": { "maxlength": "255" }
+    },
+    {
+      "type": "input",
+      "class": "migx-col-2",
+      "name": "tags",
+      "caption": "Теги (через |)",
+      "description": "3 тега на карточке, например: «12 мм|Влагостойкий|Антибактериальный»",
+      "options": {}
+    },
+    {
+      "type": "listbox",
+      "class": "migx-col-2",
+      "name": "properties",
+      "caption": "Специальные свойства",
+      "description": "Фильтры каталога: «Специальные свойства»",
+      "options": {
+        "multiple": "1",
+        "options": "fire|biocidal|chemical|moisture",
+        "options_caption": "Трудногорючий|Биоцидный|Химически стойкий|Влагостойкий"
+      }
+    },
+    {
+      "type": "input",
+      "class": "migx-col-1",
+      "name": "stock",
+      "caption": "Наличие",
+      "options": {
+        "options": "in_stock|under_order|request",
+        "options_caption": "В наличии|Под заказ|По запросу"
+      }
+    },
+    {
+      "type": "selectbox",
+      "class": "migx-col-1",
+      "name": "price_kind",
+      "caption": "Тип цены",
+      "description": "from — цена за м²; term — срок; request — цена по запросу",
+      "options": { "options": "from|term|request", "options_caption": "Цена от, ₽/м²|Срок|По запросу" }
+    },
+    {
+      "type": "input",
+      "class": "migx-col-1",
+      "name": "price_label",
+      "caption": "Подпись цены",
+      "description": "Например: «Цена за м²», «Срок», «Производство», «Цена по запросу»",
+      "options": {}
+    },
+    {
+      "type": "input",
+      "class": "migx-col-1",
+      "name": "price_value",
+      "caption": "Значение цены",
+      "description": "Например: «от 4 200 ₽», «от 15 дней», «Цена по расчёту»",
+      "options": {}
+    },
+    {
+      "type": "image",
+      "class": "migx-col-3",
+      "name": "image",
+      "caption": "Изображение",
+      "description": "Рекомендуемый размер: 800×600 (4:3)",
+      "options": {}
+    },
+    {
+      "type": "textarea",
+      "class": "migx-col-3",
+      "name": "short_desc",
+      "caption": "Короткое описание",
+      "description": "1-2 предложения: описание на карточке товара",
+      "options": {}
+    },
+    {
+      "type": "input",
+      "class": "migx-col-1",
+      "name": "production_days",
+      "caption": "Срок производства, раб. дней",
+      "options": { "class": "number" }
+    },
+    {
+      "type": "input",
+      "class": "migx-col-1",
+      "name": "min_order",
+      "caption": "Минимальный заказ",
+      "description": "Например: «от 10 м²», «от 1 листа»",
+      "options": {}
+    },
+    {
+      "type": "input",
+      "class": "migx-col-1",
+      "name": "delivery",
+      "caption": "Доставка",
+      "description": "Например: «Москва и регионы России»",
+      "options": {}
+    },
+    {
+      "type": "url",
+      "class": "migx-col-2",
+      "name": "url",
+      "caption": "Ссылка на карточку товара",
+      "description": "Полный URL ресурса-карточки (пусто = /slug/)",
+      "options": {}
+    }
+  ],
+  "types": {}
+}

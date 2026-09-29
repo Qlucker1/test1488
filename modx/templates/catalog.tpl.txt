@@ -1,0 +1,223 @@
+<!-- ==========================================================================
+  ШАБЛОН MODX: HPL Catalog
+  Страница «Каталог HPL-панелей Lemark».
+
+  Схема <head> (как просили — отдельный чанк CSS рядом со style.css):
+    <style>[[*style.css*]]</style>    <- базовые стили раздела (чанк)
+    <style>[[*catalog.css*]]</style>  <- CSS ТОЛЬКО этой страницы (чанк)
+
+  Товары подтягиваются из MIGX-грида snippet'ом snGetHplProducts
+  (контейнер — ресурс с алиасом hpl-catalog-container, TV hpl_products).
+
+  Ресурсу нужно задать:
+    - pagetitle: «Каталог HPL-панелей Lemark»
+    - description: SEO-описание
+    - content: SEO-текст страницы (заголовок «Каталог HPL Lemark» + абзацы)
+    - alias: katalog-hpl
+  ========================================================================== -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[[*pagetitle:default=`Каталог HPL-панелей Lemark`]] — производитель HPL-пластика</title>
+  <meta name="description" content="[[*description:default=`Каталог HPL-панелей Lemark: подберите HPL по применению, типу материала, толщине и характеристикам. Более 3156 декоров.`*]]">
+  <link rel="canonical" href="[[++site_url]][[*alias:default=`katalog-hpl`*]]/">
+  <!-- Страховка: если VisueltPro не загрузится, fallback Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Базовые стили раздела: чанк style.css -->
+  <style>
+  [[*style.css*]]
+  </style>
+
+  <!-- CSS текущей страницы: отдельный чанк catalog.css рядом со style.css.
+       Для новых страниц — свой чанк (product.css, ...insert-здесь-имя). -->
+  <style>
+  [[*catalog.css*]]
+  </style>
+</head>
+<body>
+
+  [[*header*]]
+
+  <main class="main-content">
+    <div class="header-placeholder"></div>
+
+    <div class="section-fc" style="grid-template-columns: var(--gaps) 1fr var(--gaps);">
+      <div class="section-fc__container" style="width:100%;">
+
+        <!-- Заголовок страницы -->
+        <section class="catalog-intro">
+          <h1 class="catalog-intro__heading">[[*pagetitle*]]</h1>
+          <p class="catalog-intro__desc">Подберите HPL по применению, типу материала, толщине и характеристикам.</p>
+        </section>
+
+        <!-- Быстрый фильтр по применению (иконки, как в макете) -->
+        <section class="catalog-apps" id="catalogApps" aria-label="Подберите HPL по применению">
+          <span class="catalog-apps__label">Подберите HPL по применению</span>
+          <div class="catalog-apps__grid">
+            <button class="app-tile" type="button" data-app="faades">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 21h18M5 21V5.5L12 3v18M12 21V8l7 2.5V21M8 8h.01M8 11h.01M8 14h.01M8 17h.01M15.5 13h.01M15.5 16h.01"/></svg>
+              <span>Фасады</span>
+            </button>
+            <button class="app-tile" type="button" data-app="peregorodki">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M4 9h16M15 6h.01M8 13v4"/></svg>
+              <span>Перегородки</span>
+            </button>
+            <button class="app-tile" type="button" data-app="medicina">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+              <span>Медицина</span>
+            </button>
+            <button class="app-tile" type="button" data-app="laboratorii">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M9 3h6M10 3v6.3L4.8 18a2 2 0 0 0 1.8 3h10.8a2 2 0 0 0 1.8-3L14 9.3V3M7.5 14h9"/></svg>
+              <span>Лаборатории</span>
+            </button>
+            <button class="app-tile" type="button" data-app="orientka">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 11l9-8 9 8M5.5 9.5V21h13V9.5M10 21v-6h4v6"/></svg>
+              <span>Отделка</span>
+            </button>
+            <button class="app-tile" type="button" data-app="mebel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M6 11V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v6M4 18v-3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3M4 18h16M6 18v2M18 18v2"/></svg>
+              <span>Мебель</span>
+            </button>
+            <button class="app-tile" type="button" data-app="transport">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="4" y="4" width="16" height="13" rx="2"/><path d="M4 10h16M8 21l1-2.5M16 21l-1-2.5M8.5 14h.01M15.5 14h.01"/></svg>
+              <span>Транспорт</span>
+            </button>
+            <button class="app-tile app-tile--all is-active" type="button" data-app="all">
+              <span>Все сферы</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- ============ Фильтры (слева, доп. параметры) + каталог (справа) ============ -->
+        <div class="catalog-layout">
+
+          <!-- Сайдбар доп. фильтров (статичный; JS фильтрует предрендеренные карточки) -->
+          <aside class="catalog-filters" id="catalogFilters" aria-label="Фильтры каталога">
+            <div class="catalog-filters__head">
+              <h2 class="catalog-filters__title">Фильтры</h2>
+              <button class="catalog-filters__reset js-reset" type="button">Сбросить</button>
+            </div>
+
+            <div class="catalog-filters__group">
+              <h3 class="catalog-filters__label">Тип материала</h3>
+              <label class="check"><input type="checkbox" data-filter="category" value="Compact HPL"><span class="check__box"></span>Compact HPL</label>
+              <label class="check"><input type="checkbox" data-filter="category" value="Standard HPL"><span class="check__box"></span>Standard HPL</label>
+              <label class="check"><input type="checkbox" data-filter="category" value="Facade HPL"><span class="check__box"></span>Facade HPL</label>
+              <label class="check"><input type="checkbox" data-filter="category" value="Laboratory HPL"><span class="check__box"></span>Laboratory HPL</label>
+            </div>
+
+            <div class="catalog-filters__group">
+              <h3 class="catalog-filters__label">Толщина</h3>
+              <div class="catalog-filters__thickness">
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="4">4 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="6">6 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="8">8 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="10">10 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="12">12 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="16">16 мм</button>
+                <button class="thickness-toggle" type="button" data-filter="thickness" data-value="25">25 мм</button>
+              </div>
+            </div>
+
+            <div class="catalog-filters__group">
+              <h3 class="catalog-filters__label">Специальные свойства</h3>
+              <label class="check"><input type="checkbox" data-filter="property" value="fire"><span class="check__box"></span>Трудногорючий</label>
+              <label class="check"><input type="checkbox" data-filter="property" value="biocidal"><span class="check__box"></span>Биоцидный</label>
+              <label class="check"><input type="checkbox" data-filter="property" value="chemical"><span class="check__box"></span>Химически стойкий</label>
+              <label class="check"><input type="checkbox" data-filter="property" value="moisture"><span class="check__box"></span>Влагостойкий</label>
+            </div>
+
+            <button class="catalog-filters__more js-filters-more" type="button" aria-expanded="false">
+              <span class="catalog-filters__more-icon">+</span>Дополнительные параметры
+            </button>
+            <div class="catalog-filters__extra" id="catalogFiltersExtra" hidden>
+              <div class="catalog-filters__group">
+                <h3 class="catalog-filters__label">Наличие</h3>
+                <label class="check"><input type="checkbox" data-filter="stock" value="in_stock"><span class="check__box"></span>В наличии</label>
+                <label class="check"><input type="checkbox" data-filter="stock" value="under_order"><span class="check__box"></span>Под заказ</label>
+                <label class="check"><input type="checkbox" data-filter="stock" value="request"><span class="check__box"></span>По запросу</label>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Контент каталога -->
+          <div class="catalog-main">
+
+            <!-- Панель результатов -->
+            <div class="catalog-toolbar">
+              <span class="catalog-toolbar__count" id="catalogCount">Найдено <b>…</b> решений</span>
+              <div class="catalog-chips" id="catalogChips"></div>
+              <div class="catalog-sort">
+                <span>Сортировка:</span>
+                <select id="catalogSort" aria-label="Сортировка">
+                  <option value="recommended">Сначала рекомендуемые</option>
+                  <option value="thickness">По толщине</option>
+                  <option value="name">По названию</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Сетка карточек: MIGX-грид (контейнер hpl-catalog-container) -->
+            <section class="catalog-grid" id="catalogGrid" aria-label="Список товаров">
+              [[+snGetHplProducts?&container=`hpl-catalog-container`*]]
+            </section>
+
+            <!-- Пусто -->
+            <div class="catalog-empty" id="catalogEmpty" hidden>
+              <b>Ничего не найдено</b>
+              Попробуйте изменить параметры фильтров.
+            </div>
+
+            <!-- Загрузить еще -->
+            <div class="catalog-loadmore" id="catalogLoadmore" hidden>
+              <div>
+                <button class="border-red-button js-loadmore" type="button">Загрузить еще</button>
+                <div class="catalog-loadmore__note" id="catalogLoadmoreNote"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CTA: помощь с подбором -->
+    <section class="catalog-cta">
+      <div class="catalog-cta__inner">
+        <div>
+          <h2 class="catalog-cta__heading">Не уверены, какой HPL выбрать?</h2>
+          <p class="catalog-cta__desc">Расскажите о проекте — поможем подобрать материал, толщину и подходящие технические характеристики под вашу задачу.</p>
+        </div>
+        <div class="catalog-cta__buttons">
+          <button class="border-red-button js-open-callback" type="button">Помочь с подбором</button>
+          <button class="common-button js-open-spec" type="button">Отправить спецификацию</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEO-текст из контента ресурса -->
+    <section class="catalog-seo section-fc">
+      <div class="section-fc__container">
+        [[*content*]]
+      </div>
+    </section>
+
+  </main>
+
+  [[*footer*]]
+
+  [[*popups*]]
+
+  <div class="toast" id="toast"></div>
+
+  <!-- JS: базовый + JS каталога (работает с предрендеренными карточками) -->
+  <script src="[[++site_url]]assets/templates/assets/js/main.js?v=[[++core_version]]"></script>
+  <script src="[[++site_url]]assets/templates/assets/js/catalog.js?v=[[++core_version]]"></script>
+</body>
+</html>

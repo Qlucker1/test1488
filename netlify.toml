@@ -1,0 +1,24 @@
+# Netlify — конфигурация тестовой вёрстки каталога HPL Lemark
+# Репозиторий деплоится как статический сайт: корень = публикуемый каталог.
+
+[build]
+  publish = "."
+  command = ""
+
+# Простые заголовки безопасности
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+    Content-Type = "application/json; charset=utf-8"
+
+# 404 → каталог (все нестандартные адреса ведут на главную)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

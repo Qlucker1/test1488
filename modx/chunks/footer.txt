@@ -1,0 +1,50 @@
+<!-- ==========================================================================
+  ЧАНК MODX: footer
+  Подвал — как на lemarkllc.ru (контакты, меню, гигантский водяной логотип).
+  ========================================================================== -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__contacts">
+      <div class="footer__contacts-item">
+        <b>Адрес</b>
+        <span>141503, МО, г. Солнечногорск,<br>Бутырский тупик, вл. 4, стр. 1</span>
+      </div>
+      <div class="footer__contacts-item">
+        <b>Телефон</b>
+        <a href="tel:+74952216336">+7 (495) 221-63-36</a>
+      </div>
+      <div class="footer__contacts-item">
+        <b>E-mail</b>
+        <a href="mailto:sales@lemarkllc.ru">sales@lemarkllc.ru</a>
+      </div>
+      <div class="footer__contacts-item">
+        <b>Время работы</b>
+        <span>пн-пт 09:00-18:00</span>
+      </div>
+      <div class="footer__contacts-item">
+        <b>ООО «ЛЕМАРК»</b>
+        <a href="https://yandex.ru/maps/?text=Солнечногорск%20Бутырский%20тупик%204" target="_blank" rel="noopener">Показать на карте</a>
+      </div>
+      <div class="footer__contacts-item">
+        <b>Обратная связь</b>
+        <button class="border-red-button footer__callback js-open-callback" type="button">Перезвоните мне</button>
+      </div>
+    </div>
+
+    <nav class="footer__menu" aria-label="Меню в подвале">
+      <a href="[[++site_url]]">Главная</a>
+      <a href="[[++site_url]]katalog-dekorov-hpl/">Каталог декоров</a>
+      <a href="[[++site_url]]katalog-hpl/">Каталог HPL</a>
+      <a href="[[++site_url]]poleznaya-informacziya/">Полезная информация</a>
+      <a href="[[++site_url]]o-kompanii/">О компании</a>
+      <a href="[[++site_url]]contacts/">Контакты</a>
+    </nav>
+  </div>
+
+  <div class="footer__copy">
+    <span>© 2008–<span id="footerYear"></span> ООО «ЛЕМАРК» — завод HPL-пластика полного цикла</span>
+    <a href="[[++site_url]]politika-konfidenczialnosti/">Политика конфиденциальности</a>
+  </div>
+
+  <div class="footer__text-logo" aria-hidden="true">LEMARK</div>
+</footer>
