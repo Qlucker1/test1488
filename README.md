@@ -116,6 +116,6 @@ stock, price{kind,label,value}, image, short_desc, production_days, min_order, d
 ## Тесты JS
 
 `tests/smoke_test.js` — Node-тесты логики (DOM-шим, браузер не нужен):
-рендер сетки, фильтры, сортировка, load-more, рендер карточки, декоры,
-MODX-JSON-режим. Запуск: `node tests/smoke_test.js` (проходят на Node 18+).
+рендер сетки, фильтры, сортировка, load-more, рендер карточки,
+конфигуратор (группы декоров), MODX-JSON-режим. Запуск: `node tests/smoke_test.js` (проходят на Node 18+).
 Прогоняйте после изменений `assets/js/*.js` или `data/products.json`.

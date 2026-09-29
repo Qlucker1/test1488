@@ -184,6 +184,12 @@
               <div class="product-configurator__inner" style="margin-top:2em;">
                 <div class="config-group">
                   <div class="config-group__title"><i>1.</i> Декор</div>
+                  <div class="config-decor-groups" id="configDecorGroups">
+                    <button class="config-decor-group is-selected" type="button" data-group="solid">Однотонные</button>
+                    <button class="config-decor-group" type="button" data-group="wood">Древесные</button>
+                    <button class="config-decor-group" type="button" data-group="stone">Каменные</button>
+                    <button class="config-decor-group" type="button" data-group="fantasy">Фантазийные</button>
+                  </div>
                   <div class="config-decor-swatches" id="configDecor"><!-- JS --></div>
                 </div>
                 <div class="config-group">
@@ -231,24 +237,6 @@
             <span>Все технические файлы</span>
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M7 17L17 7M9 7h8v8"/></svg>
           </a>
-        </section>
-
-        <!-- ====== Выберите декор ====== -->
-        <section class="product-decors section-fc">
-          <h2 class="section-fc__heading heading">Выберите декор</h2>
-          <div class="section-fc__container">
-            <p class="product-decors__intro">Более 250 вариантов исполнения: от классических монохромных цветов до реалистичных имитаций дерева и натурального камня.</p>
-            <div class="decor-tabs" id="decorTabs">
-              <button class="decor-tab is-active" type="button" data-decor="solid">Однотонные</button>
-              <button class="decor-tab" type="button" data-decor="wood">Древесные</button>
-              <button class="decor-tab" type="button" data-decor="stone">Каменные</button>
-              <button class="decor-tab" type="button" data-decor="fantasy">Фантазийные</button>
-            </div>
-            <div class="decor-grid" id="decorGrid"><!-- JS --></div>
-            <div class="product-decors__more">
-              <a class="border-red-button" href="https://lemarkllc.ru/katalog-dekorov-hpl/" target="_blank" rel="noopener">Смотреть все декоры</a>
-            </div>
-          </div>
         </section>
 
         <!-- ====== Технические характеристики ====== -->

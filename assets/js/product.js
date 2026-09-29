@@ -199,15 +199,34 @@
   }
 
   /* ---------- Конфигуратор ---------- */
-  var config = { decor: DECORS.solid.items[0], emboss: 'MT', format: '3050×1320', processing: 'none' };
+  var config = { decor: DECORS.solid.items[0], decorGroup: 'solid', emboss: 'MT', format: '3050×1320', processing: 'none' };
 
-  function initConfigurator() {
-    // декор-свотчи (однотонные, выборка)
-    els.configDecor.innerHTML = DECORS.solid.items.slice(0, 8).map(function (d, i) {
+  function renderConfigDecor(group) {
+    config.decorGroup = group;
+    var items = DECORS[group].items;
+    els.configDecor.innerHTML = items.slice(0, 8).map(function (d, i) {
       return '<button class="config-decor-swatch' + (i === 0 ? ' is-selected' : '') + '" type="button" data-decor="' + d.code + '" aria-label="' + esc(d.name) + '">' +
              '<img src="' + esc(d.img) + '" alt="" loading="lazy">' +
              '<span class="config-decor-swatch__code">' + esc(d.code) + '</span></button>';
     }).join('');
+    // при смене группы выбираем первый декор группы
+    config.decor = items[0];
+  }
+
+  function initConfigurator() {
+    // группа декоров (однотонные / древесные / каменные / фантазийные)
+    if (els.configDecorGroups) {
+      els.configDecorGroups.addEventListener('click', function (e) {
+        var btn = e.target.closest('.config-decor-group');
+        if (!btn) return;
+        els.configDecorGroups.querySelectorAll('.config-decor-group').forEach(function (b) {
+          b.classList.toggle('is-selected', b === btn);
+        });
+        renderConfigDecor(btn.dataset.group);
+        updateSummary();
+      });
+    }
+    renderConfigDecor('solid');
 
     els.configDecor.addEventListener('click', function (e) {
       var btn = e.target.closest('.config-decor-swatch');
@@ -215,7 +234,7 @@
       els.configDecor.querySelectorAll('.config-decor-swatch').forEach(function (b) {
         b.classList.toggle('is-selected', b === btn);
       });
-      config.decor = DECORS.solid.items.find(function (d) { return d.code === btn.dataset.decor; });
+      config.decor = DECORS[config.decorGroup].items.find(function (d) { return d.code === btn.dataset.decor; });
       updateSummary();
     });
 
@@ -246,47 +265,6 @@
     if (popupConfig) {
       popupConfig.innerHTML = 'Конфигурация: ' + html + '. Укажите контакты — пришлём расчёт в течение рабочего дня.';
     }
-  }
-
-  /* ---------- Декоры ---------- */
-  function renderDecors() {
-    var tabs = els.decorTabs.querySelectorAll('.decor-tab');
-    tabs.forEach(function (tab) {
-      tab.addEventListener('click', function () {
-        tabs.forEach(function (t) { t.classList.remove('is-active'); });
-        tab.classList.add('is-active');
-        renderDecorGrid(tab.dataset.decor);
-      });
-    });
-    renderDecorGrid('solid');
-  }
-
-  function renderDecorGrid(group) {
-    var items = DECORS[group].items;
-    els.decorGrid.innerHTML = items.map(function (d) {
-      return '<button class="decor-swatch" type="button" data-decor="' + d.code + '">' +
-        '<span class="decor-swatch__picture"><img src="' + esc(d.img) + '" alt="' + esc(d.name) + '" loading="lazy"></span>' +
-        '<span class="decor-swatch__code">' + esc(d.code) + '</span>' +
-        '<span class="decor-swatch__name">' + esc(d.name) + '</span>' +
-        '<span class="decor-swatch__emboss">' + esc(d.emboss) + '</span>' +
-      '</button>';
-    }).join('');
-
-    els.decorGrid.onclick = function (e) {
-      var sw = e.target.closest('.decor-swatch');
-      if (!sw) return;
-      // выбор декора подхватывает конфигуратор
-      var groupItems = Object.keys(DECORS).map(function (k) { return DECORS[k].items; }).reduce(function (a, b) { return a.concat(b); }, []);
-      var d = groupItems.find(function (x) { return x.code === sw.dataset.decor; });
-      if (d) {
-        config.decor = d;
-        els.configDecor.querySelectorAll('.config-decor-swatch').forEach(function (b) {
-          b.classList.remove('is-selected');
-        });
-        updateSummary();
-        if (window.Lemark) window.Lemark.toast('Декор <b>' + esc(d.code + ' ' + d.name) + '</b> добавлен в конфигурацию');
-      }
-    };
   }
 
   /* ---------- Технические характеристики ---------- */
@@ -461,8 +439,8 @@
   function init() {
     ['breadcrumbs', 'productTitle', 'productDesc', 'productSpecs', 'productPriceValue',
      'galleryImage', 'galleryCaption', 'galleryTabs', 'factProduction', 'factMinOrder',
-     'factDelivery', 'thicknessChips', 'configDecor', 'configSummary', 'decorTabs',
-     'decorGrid', 'techspecGroups', 'whyGrid', 'whyHeading', 'applyingGrid', 'projectsGrid',
+     'factDelivery', 'thicknessChips', 'configDecorGroups', 'configDecor', 'configSummary',
+     'techspecGroups', 'whyGrid', 'whyHeading', 'applyingGrid', 'projectsGrid',
      'relatedGrid', 'faqList'
     ].forEach(function (id) {
       els[id] = $id(id);
@@ -477,7 +455,6 @@
       initGallery(p);
       renderThicknesses(p);
       initConfigurator();
-      renderDecors();
       renderTechspecs(p);
       renderWhy(p);
       renderApplying(p);

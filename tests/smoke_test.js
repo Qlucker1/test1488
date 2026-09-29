@@ -139,15 +139,6 @@ function check(name, cond, extra = '') {
 (async function testProduct() {
   console.log('product.js:');
   const { sandbox, byId, docListeners } = makeEnv({ search: '?id=hpl-12-peregorodki' });
-  // статичные вкладки декора из product.html
-  const decorTabs = ['solid', 'wood', 'stone', 'fantasy'].map(g => {
-    const t = new FakeEl('tab-' + g);
-    t.dataset = { decor: g };
-    return t;
-  });
-  const decorTabsEl = new FakeEl('decorTabs');
-  decorTabsEl.querySelectorAll = sel => (sel === '.decor-tab' ? decorTabs : []);
-  byId['decorTabs'] = decorTabsEl;
   vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets/js/main.js'), 'utf8'), sandbox, { filename: 'main.js' });
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets/js/product.js'), 'utf8'), sandbox, { filename: 'product.js' });
@@ -161,7 +152,6 @@ function check(name, cond, extra = '') {
   const facts = byId['factProduction'];
   const thicks = byId['thicknessChips'];
   const configSummary = byId['configSummary'];
-  const decorGrid = byId['decorGrid'];
   const tech = byId['techspecGroups'];
   const why = byId['whyGrid'];
   const applying = byId['applyingGrid'];
@@ -180,7 +170,7 @@ function check(name, cond, extra = '') {
   check('thickness chips 6/8/10/12/16/25 (без категорий)', ['6', '8', '10', '12', '16', '25'].every(t => thicks.innerHTML.includes(t + ' мм')) && !thicks.innerHTML.includes('Laboratory'));
   check('current thickness marked «— текущая»', thicks.innerHTML.includes('is-current') && thicks.innerHTML.includes('— текущая'));
   check('config summary: 0101 + Super Matt', configSummary.innerHTML.includes('0101') && configSummary.innerHTML.includes('Super Matt'), configSummary.innerHTML);
-  check('decor grid: 8 solid swatches', count(decorGrid.innerHTML, 'class="decor-swatch"') === 8, 'got ' + count(decorGrid.innerHTML, 'class="decor-swatch"'));
+  check('конфигуратор: 8 свотчей однотонных', count(byId['configDecor'].innerHTML, 'config-decor-swatch__code') === 8 && byId['configDecor'].innerHTML.includes('0101'), 'got ' + count(byId['configDecor'].innerHTML, 'config-decor-swatch__code'));
   check('techspec: 3 groups', count(tech.innerHTML, 'class="techspec-group"') === 3 && tech.innerHTML.includes('Абсолютная'));
   check('why: featured set (peregorodki)', why.innerHTML.includes('Влагостойкость') && why.innerHTML.includes('Антивандальность'));
   check('applying: 6 items', count(applying.innerHTML, 'product-applying__item') === 6 && applying.innerHTML.includes('Туалетные кабины'));
@@ -188,9 +178,19 @@ function check(name, cond, extra = '') {
   check('related: cards rendered', count(related.innerHTML, 'class="related-card"') >= 1, 'got ' + count(related.innerHTML, 'class="related-card"'));
   check('faq: 4 items', count(faq.innerHTML, 'faq-item__front') === 4 && faq.innerHTML.includes('Можно ли использовать HPL 12 мм в душевых?'));
 
-  decorTabs[1]._listeners['click'].forEach(fn => fn());
+  // переключение группы декоров в конфигураторе: «Древесные»
+  (byId['configDecorGroups']._listeners['click'] || []).forEach(fn => fn({
+    target: { closest: () => ({ dataset: { group: 'wood' } }) }
+  }));
   await wait(30);
-  check('decor tab «Древесные» → wood swatches', byId['decorGrid'].innerHTML.includes('0501') && byId['decorGrid'].innerHTML.includes('Дуб молочный') && count(byId['decorGrid'].innerHTML, 'class="decor-swatch"') === 8);
+  check('конфигуратор: группа «Древесные» → wood-свотчи', byId['configDecor'].innerHTML.includes('0501') && count(byId['configDecor'].innerHTML, 'config-decor-swatch__code') === 8, 'got ' + count(byId['configDecor'].innerHTML, 'config-decor-swatch__code'));
+  check('конфигуратор: summary обновился (0501)', byId['configSummary'].innerHTML.includes('0501'), byId['configSummary'].innerHTML);
+  // и обратно — «Каменные»
+  (byId['configDecorGroups']._listeners['click'] || []).forEach(fn => fn({
+    target: { closest: () => ({ dataset: { group: 'stone' } }) }
+  }));
+  await wait(30);
+  check('конфигуратор: группа «Каменные» → stone-свотчи', byId['configDecor'].innerHTML.includes('0701'));
 
   const env2 = makeEnv({ search: '' });
   vm.createContext(env2.sandbox);
